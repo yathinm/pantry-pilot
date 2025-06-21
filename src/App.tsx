@@ -1,22 +1,22 @@
+// App.tsx
 import React from 'react';
+import { Box } from '@mui/material';
 import SignupPage from './components/SignupPage';
 
-import { Box } from '@mui/material';
-
 function App() {
-
   const handlePageChange = (page: string) => {
-    console.log("Would switch to page:", page);
+    console.log('Switch to page:', page);
   };
 
   return (
     <Box
       sx={{
-        minHeight: '100vh',
+        minHeight: '100vh',     
+        width: '100%',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        bgcolor: 'white.100', 
+        alignItems: 'center',   
+        justifyContent: 'center', 
+        bgcolor: 'white',       
       }}
     >
       <SignupPage setPage={handlePageChange} />

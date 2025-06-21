@@ -1,57 +1,155 @@
-// SignupPage.tsx
-import React from 'react';
-import { Box, Card, CardContent, Button } from '@mui/material';
+// src/components/SignupPage.tsx
+import React, { useState } from 'react';
+import {
+  Box,
+  Button,
+  Divider,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
-import { signInWithPopup } from 'firebase/auth';
+import {
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+} from 'firebase/auth';
 import { auth, provider } from '../firebase';
 
 interface SignupPageProps {
   setPage: (page: string) => void;
 }
 
+/* ---------- Google OAuth ---------- */
 const handleGoogleSignIn = async () => {
-  console.log('Attempting Google sign-in...');
   try {
-    const result = await signInWithPopup(auth, provider);
-    console.log('Signed-in user:', result.user);
-  } catch (error) {
-    console.error('Sign-in failed:', error);
+    const { user } = await signInWithPopup(auth, provider);
+    console.log('Signed-in user:', user);
+    // TODO: navigate to dashboard
+  } catch (err) {
+    console.error('Google sign-in failed:', err);
   }
 };
 
-const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => (
-  <Box
-    sx={{
-      minHeight: '100vh',          
-      width: '100%',
-      display: 'flex',             
-      alignItems: 'center',        
-      justifyContent: 'center',    
-      bgcolor: 'white',            
-      px: 2,                       
-    }}
-  >
+const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
+  /* form state */
+  const [email, setEmail]       = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading]   = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
-    <Card sx={{ width: 380, maxWidth: '100%' }}>
-      <CardContent sx={{ p: 4 }}>
+  /* ---------- Email/password signup ---------- */
+  const handleEmailSignup = async () => {
+    setErrorMsg('');
+    setLoading(true);
+    try {
+      const { user } = await createUserWithEmailAndPassword(
+        auth,
+        email.trim(),
+        password
+      );
+      console.log('Created user:', user);
+      // TODO: navigate to dashboard
+    } catch (err: any) {
+      switch (err.code) {
+        case 'auth/email-already-in-use':
+          setErrorMsg('That email is already registered.');
+          break;
+        case 'auth/invalid-email':
+          setErrorMsg('Enter a valid email address.');
+          break;
+        case 'auth/weak-password':
+          setErrorMsg('Password should be at least 6 characters.');
+          break;
+        default:
+          setErrorMsg('Could not create account. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* ---------- UI ---------- */
+  return (
+    <Box
+      sx={{
+        minHeight: '100vh',
+        width: '100vw',          // fills viewport
+        bgcolor: 'white',        // full-page white background
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        px: 2,                   // small side padding on tiny screens
+      }}
+    >
+      <Box
+        sx={{
+          width: 420,
+          maxWidth: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+      >
         <Button
           fullWidth
           variant="contained"
           startIcon={<GoogleIcon />}
-          sx={{ py: 1.5, mb: 2 }}
           onClick={handleGoogleSignIn}
+          sx={{
+            py: 1.6,
+            fontWeight: 600,
+            textTransform: 'none',
+            transition: 'transform 0.15s',
+            '&:hover': { transform: 'translateY(-2px)' },
+          }}
         >
-          Sign Up with Google
+          Sign up with Google
         </Button>
 
-        <Box sx={{ textAlign: 'center' }}>
+        <Divider>or</Divider>
+
+        <Stack spacing={2}>
+          <TextField
+            label="Email"
+            type="email"
+            fullWidth
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <TextField
+            label="Password"
+            type="password"
+            fullWidth
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </Stack>
+
+        <Button
+          fullWidth
+          variant="outlined"
+          disabled={loading || !email || password.length < 6}
+          onClick={handleEmailSignup}
+          sx={{ py: 1.3, textTransform: 'none' }}
+        >
+          {loading ? 'Creating account…' : 'Create Account'}
+        </Button>
+
+        {errorMsg && (
+          <Typography color="error" variant="body2">
+            {errorMsg}
+          </Typography>
+        )}
+
+        <Typography variant="body2" textAlign="center">
+          Already have an account?{' '}
           <Button size="small" onClick={() => setPage('LoginPage')}>
-            Already have an account? Sign In
+            Log in
           </Button>
-        </Box>
-      </CardContent>
-    </Card>
-  </Box>
-);
+        </Typography>
+      </Box>
+    </Box>
+  );
+};
 
 export default SignupPage;
