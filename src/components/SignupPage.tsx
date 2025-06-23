@@ -11,7 +11,7 @@ import GoogleIcon from '@mui/icons-material/Google';
 import {
   createUserWithEmailAndPassword,
   signInWithPopup,
-  updateProfile, 
+  updateProfile,
 } from 'firebase/auth';
 import { auth, provider } from '../firebase';
 
@@ -30,8 +30,8 @@ const handleGoogleSignIn = async () => {
 const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState(''); 
-  const [lastName, setLastName] = useState('');   
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -47,7 +47,6 @@ const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
       await updateProfile(user, {
         displayName: `${firstName.trim()} ${lastName.trim()}`,
       });
-
     } catch (err: any) {
       switch (err.code) {
         case 'auth/email-already-in-use':
@@ -66,22 +65,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
       setLoading(false);
     }
   };
-
-<<<<<<< HEAD
   return (
-=======
-return (
-  <Box
-    sx={{
-      minHeight: '100vh',
-      width: '100vw',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      px: 2,
-    }}
-  >
->>>>>>> 7e444fadfbef3101d068bc34abba31260dee0c67
     <Box
       sx={{
         width: 420,
@@ -115,18 +99,18 @@ return (
 
       <Stack spacing={2}>
         <Stack direction="row" spacing={2}>
-            <TextField
-                label="First Name"
-                fullWidth
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-            />
-            <TextField
-                label="Last Name"
-                fullWidth
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-            />
+          <TextField
+            label="First Name"
+            fullWidth
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+          />
+          <TextField
+            label="Last Name"
+            fullWidth
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+          />
         </Stack>
 
         <TextField
