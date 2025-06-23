@@ -1,4 +1,3 @@
-// src/components/SignupPage.tsx
 import React, { useState } from 'react';
 import {
   Box,
@@ -19,25 +18,21 @@ interface SignupPageProps {
   setPage: (page: string) => void;
 }
 
-/* ---------- Google OAuth ---------- */
 const handleGoogleSignIn = async () => {
   try {
     const { user } = await signInWithPopup(auth, provider);
     console.log('Signed-in user:', user);
-    // TODO: navigate to dashboard
   } catch (err) {
     console.error('Google sign-in failed:', err);
   }
 };
 
 const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
-  /* form state */
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading]   = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  /* ---------- Email/password signup ---------- */
   const handleEmailSignup = async () => {
     setErrorMsg('');
     setLoading(true);
@@ -48,7 +43,6 @@ const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
         password
       );
       console.log('Created user:', user);
-      // TODO: navigate to dashboard
     } catch (err: any) {
       switch (err.code) {
         case 'auth/email-already-in-use':
@@ -68,17 +62,16 @@ const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
     }
   };
 
-  /* ---------- UI ---------- */
   return (
     <Box
       sx={{
         minHeight: '100vh',
-        width: '100vw',          // fills viewport
-        bgcolor: 'white',        // full-page white background
+        width: '100vw',          
+        bgcolor: 'white',       
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        px: 2,                   // small side padding on tiny screens
+        px: 2,                   
       }}
     >
       <Box
