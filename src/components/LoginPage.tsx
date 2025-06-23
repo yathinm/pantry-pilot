@@ -1,8 +1,6 @@
 // src/components/LoginPage.tsx
 
 import React, { useState } from 'react';
-
-// Import Material-UI components
 import {
   Box,
   Button,
@@ -58,7 +56,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setPage }) => {
       }}
     >
       <Typography variant="h5" sx={{ fontWeight: 'bold', textAlign: 'center' }}>
-        Log in to Pantry Pilot
+        Pantry Pilot
       </Typography>
 
       <Button

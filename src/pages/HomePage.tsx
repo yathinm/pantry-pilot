@@ -18,10 +18,7 @@ const HomePage: React.FC = () => {
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Welcome to Pantry Pilot!
-      </Typography>
-      <Typography variant="h6">
-        You are logged in as: <strong>{user?.email}</strong>
+        Welcome to Pantry Pilot <strong>{user?.displayName}</strong>! 
       </Typography>
       <Button
         variant="contained"

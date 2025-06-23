@@ -62,87 +62,92 @@ const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
     }
   };
 
-  return (
+  // Replace your entire return statement with this corrected version
+
+return (
+  <Box
+    sx={{
+      minHeight: '100vh',
+      width: '100vw',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      px: 2,
+    }}
+  >
     <Box
       sx={{
-        minHeight: '100vh',
-        width: '100vw',          
-        bgcolor: 'white',       
+        width: 420,
+        maxWidth: '100%',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        px: 2,                   
+        flexDirection: 'column',
+        gap: 2,
       }}
     >
-      <Box
+      <Typography variant="h5" sx={{ fontWeight: 'bold', textAlign: 'center' }}>
+        Pantry Pilot
+      </Typography>
+
+      <Button
+        fullWidth
+        variant="contained"
+        startIcon={<GoogleIcon />}
+        onClick={handleGoogleSignIn}
         sx={{
-          width: 420,
-          maxWidth: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 2,
+          py: 1.6,
+          fontWeight: 600,
+          textTransform: 'none',
+          transition: 'transform 0.15s',
+          '&:hover': { transform: 'translateY(-2px)' },
         }}
       >
-        <Button
+        Sign up with Google
+      </Button>
+
+      <Divider>or</Divider>
+
+      <Stack spacing={2}>
+        <TextField
+          label="Email"
+          type="email"
           fullWidth
-          variant="contained"
-          startIcon={<GoogleIcon />}
-          onClick={handleGoogleSignIn}
-          sx={{
-            py: 1.6,
-            fontWeight: 600,
-            textTransform: 'none',
-            transition: 'transform 0.15s',
-            '&:hover': { transform: 'translateY(-2px)' },
-          }}
-        >
-          Sign up with Google
-        </Button>
-
-        <Divider>or</Divider>
-
-        <Stack spacing={2}>
-          <TextField
-            label="Email"
-            type="email"
-            fullWidth
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <TextField
-            label="Password"
-            type="password"
-            fullWidth
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </Stack>
-
-        <Button
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <TextField
+          label="Password"
+          type="password"
           fullWidth
-          variant="outlined"
-          disabled={loading || !email || password.length < 6}
-          onClick={handleEmailSignup}
-          sx={{ py: 1.3, textTransform: 'none' }}
-        >
-          {loading ? 'Creating account…' : 'Create Account'}
-        </Button>
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </Stack>
 
-        {errorMsg && (
-          <Typography color="error" variant="body2">
-            {errorMsg}
-          </Typography>
-        )}
+      <Button
+        fullWidth
+        variant="outlined"
+        disabled={loading || !email || password.length < 6}
+        onClick={handleEmailSignup}
+        sx={{ py: 1.3, textTransform: 'none' }}
+      >
+        {loading ? 'Creating account…' : 'Create Account'}
+      </Button>
 
-        <Typography variant="body2" textAlign="center">
-          Already have an account?{' '}
-          <Button size="small" onClick={() => setPage('LoginPage')}>
-            Log in
-          </Button>
+      {errorMsg && (
+        <Typography color="error" variant="body2">
+          {errorMsg}
         </Typography>
-      </Box>
+      )}
+
+      <Typography variant="body2" textAlign="center">
+        Already have an account?{' '}
+        <Button size="small" onClick={() => setPage('LoginPage')}>
+          Log in
+        </Button>
+      </Typography>
     </Box>
-  );
+  </Box>
+);
 };
 
 export default SignupPage;
