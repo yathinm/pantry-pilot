@@ -6,6 +6,7 @@ import { Box, CircularProgress } from '@mui/material';
 import LoginPage from './components/LoginPage';
 import SignupPage from './components/SignupPage';
 import HomePage from './pages/HomePage';
+import UserProfilePage from './pages/UserProfilePage';
 import { AuthProvider, useAuth } from './auth/AuthContext';
 
 function AppContent() {
@@ -16,16 +17,24 @@ function AppContent() {
     return <CircularProgress />;
   }
   if (user) {
-    return <HomePage />;
+    switch (page) {
+      case 'UserProfilePage':
+        return <UserProfilePage setPage={setPage} />; 
+      
+      case 'HomePage':
+      default:
+        return <HomePage setPage={setPage} />;
+    }
   }
   switch (page) {
-    case 'LoginPage':
-      return <LoginPage setPage={setPage} />;
     case 'SignupPage':
       return <SignupPage setPage={setPage} />;
+    
+    case 'LoginPage':
     default:
       return <LoginPage setPage={setPage} />;
   }
+  
 }
 
 function App() {

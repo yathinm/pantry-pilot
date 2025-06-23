@@ -45,7 +45,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
         password
       );
       await updateProfile(user, {
-        displayName: `${firstName.trim()} ${lastName.trim()}`,
+        displayName: `${firstName.trim()} ${lastName.trim()}`, 
       });
     } catch (err: any) {
       switch (err.code) {
