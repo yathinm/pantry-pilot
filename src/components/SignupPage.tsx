@@ -62,8 +62,6 @@ const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
     }
   };
 
-  // Replace your entire return statement with this corrected version
-
 return (
   <Box
     sx={{
