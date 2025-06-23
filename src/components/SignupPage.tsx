@@ -11,6 +11,7 @@ import GoogleIcon from '@mui/icons-material/Google';
 import {
   createUserWithEmailAndPassword,
   signInWithPopup,
+  updateProfile, 
 } from 'firebase/auth';
 import { auth, provider } from '../firebase';
 
@@ -20,17 +21,18 @@ interface SignupPageProps {
 
 const handleGoogleSignIn = async () => {
   try {
-    const { user } = await signInWithPopup(auth, provider);
-    console.log('Signed-in user:', user);
+    await signInWithPopup(auth, provider);
   } catch (err) {
     console.error('Google sign-in failed:', err);
   }
 };
 
 const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
-  const [email, setEmail]       = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading]   = useState(false);
+  const [firstName, setFirstName] = useState(''); 
+  const [lastName, setLastName] = useState('');   
+  const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   const handleEmailSignup = async () => {
@@ -42,7 +44,10 @@ const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
         email.trim(),
         password
       );
-      console.log('Created user:', user);
+      await updateProfile(user, {
+        displayName: `${firstName.trim()} ${lastName.trim()}`,
+      });
+
     } catch (err: any) {
       switch (err.code) {
         case 'auth/email-already-in-use':
@@ -62,19 +67,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
     }
   };
 
-  // Replace your entire return statement with this corrected version
-
-return (
-  <Box
-    sx={{
-      minHeight: '100vh',
-      width: '100vw',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      px: 2,
-    }}
-  >
+  return (
     <Box
       sx={{
         width: 420,
@@ -107,6 +100,21 @@ return (
       <Divider>or</Divider>
 
       <Stack spacing={2}>
+        <Stack direction="row" spacing={2}>
+            <TextField
+                label="First Name"
+                fullWidth
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+            />
+            <TextField
+                label="Last Name"
+                fullWidth
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+            />
+        </Stack>
+
         <TextField
           label="Email"
           type="email"
@@ -126,7 +134,7 @@ return (
       <Button
         fullWidth
         variant="outlined"
-        disabled={loading || !email || password.length < 6}
+        disabled={loading || !firstName || !lastName || !email || password.length < 6}
         onClick={handleEmailSignup}
         sx={{ py: 1.3, textTransform: 'none' }}
       >
@@ -134,20 +142,19 @@ return (
       </Button>
 
       {errorMsg && (
-        <Typography color="error" variant="body2">
+        <Typography color="error" variant="body2" textAlign="center">
           {errorMsg}
         </Typography>
       )}
 
       <Typography variant="body2" textAlign="center">
         Already have an account?{' '}
-        <Button size="small" onClick={() => setPage('LoginPage')}>
+        <Button size="small" onClick={() => setPage('login')}>
           Log in
         </Button>
       </Typography>
     </Box>
-  </Box>
-);
+  );
 };
 
 export default SignupPage;
