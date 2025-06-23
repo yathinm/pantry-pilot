@@ -67,7 +67,21 @@ const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
     }
   };
 
+<<<<<<< HEAD
   return (
+=======
+return (
+  <Box
+    sx={{
+      minHeight: '100vh',
+      width: '100vw',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      px: 2,
+    }}
+  >
+>>>>>>> 7e444fadfbef3101d068bc34abba31260dee0c67
     <Box
       sx={{
         width: 420,
