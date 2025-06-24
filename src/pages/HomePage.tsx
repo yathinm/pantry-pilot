@@ -5,7 +5,6 @@ import {
   Typography,
   TextField,
   CircularProgress,
-  Paper,
   Divider,
   List,
   ListItem,
@@ -25,8 +24,8 @@ interface HomePageProps {
 interface Recipe {
   title: string;
   description: string;
-  ingredients: string[];
-  instructions: string[];
+  ingredients?: string[];
+  instructions?: string[];
 }
 
 const HomePage: React.FC<HomePageProps> = ({ setPage }) => {
@@ -41,25 +40,18 @@ const HomePage: React.FC<HomePageProps> = ({ setPage }) => {
   };
 
   const handleGenerateRecipe = async () => {
-    if (!ingredients || !user) return; // Also ensure we have a user
+    if (!ingredients || !user) return; 
 
     setLoading(true);
     setError('');
     setRecipe(null);
 
     try {
-
-      
       const functions = getFunctions(app, 'us-central1');
-      
       const generateRecipeFn = httpsCallable(functions, 'generateRecipe');
-
-
       const result = await generateRecipeFn({ ingredients });
-
       const newRecipe = result.data as Recipe;
       setRecipe(newRecipe);
-
     } catch (err: any) {
       console.error("Error calling cloud function:", err);
       setError(`Error: ${err.message}`);
@@ -112,32 +104,34 @@ const HomePage: React.FC<HomePageProps> = ({ setPage }) => {
           <Typography variant="h4" component="h2" sx={{ fontWeight: 'bold' }}>{recipe.title}</Typography>
           <Typography sx={{ my: 2 }} color="text.secondary">{recipe.description}</Typography>
           
-          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4, mt: 3 }}>
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="h6" gutterBottom>Ingredients</Typography>
-              <List dense>
-                {recipe.ingredients.map((item, index) => (
-                  <ListItem key={index}>
-                    <ListItemIcon sx={{ minWidth: '32px' }}><CheckCircleOutlineIcon fontSize="small" color="primary" /></ListItemIcon>
-                    <ListItemText primary={item} />
-                  </ListItem>
-                ))}
-              </List>
+          {recipe.ingredients && recipe.instructions && (
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4, mt: 3 }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="h6" gutterBottom>Ingredients</Typography>
+                <List dense>
+                  {recipe.ingredients.map((item, index) => (
+                    <ListItem key={index}>
+                      <ListItemIcon sx={{ minWidth: '32px' }}><CheckCircleOutlineIcon fontSize="small" color="primary" /></ListItemIcon>
+                      <ListItemText primary={item} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
+              <Box sx={{ flex: 2 }}>
+                <Typography variant="h6" gutterBottom>Instructions</Typography>
+                <List>
+                  {recipe.instructions.map((step, index) => (
+                    <ListItem key={index} alignItems="flex-start">
+                      <ListItemIcon sx={{ minWidth: '40px', mt: '4px' }}>
+                        <Typography sx={{ fontWeight: 'bold' }}>{index + 1}.</Typography>
+                      </ListItemIcon>
+                      <ListItemText primary={step} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
             </Box>
-            <Box sx={{ flex: 2 }}>
-              <Typography variant="h6" gutterBottom>Instructions</Typography>
-              <List>
-                {recipe.instructions.map((step, index) => (
-                  <ListItem key={index} alignItems="flex-start">
-                    <ListItemIcon sx={{ minWidth: '40px', mt: '4px' }}>
-                      <Typography sx={{ fontWeight: 'bold' }}>{index + 1}.</Typography>
-                    </ListItemIcon>
-                    <ListItemText primary={step} />
-                  </ListItem>
-                ))}
-              </List>
-            </Box>
-          </Box>
+          )}
         </Box>
       )}
     </Box>

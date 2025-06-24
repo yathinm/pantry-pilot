@@ -40,7 +40,8 @@ export const generateRecipe = onCall({ secrets: [OPENAI_API_KEY_SECRET] }, async
 
     logger.info("v2 Function called with ingredients:", ingredients);
 
-    const prompt = `You are a helpful culinary assistant. A user has the following ingredients: ${ingredients}. Generate a single recipe they can make. Respond ONLY with a valid JSON object with the following structure: { "title": "Recipe Title", "description": "A short, enticing description", "ingredients": ["string"], "instructions": ["Step 1", "Step 2"] }`;
+    const prompt = `You are an expert chef. A user has the following ingredients: ${ingredients}. Your first task is to determine if the provided items are edible food ingredients. If the ingredients are clearly not edible (e.g., 'rocks, dirt, plastic'), you MUST respond with the following JSON object: { "title": "Inedible Ingredients", "description": "These ingredients are not edible and cannot be made into a recipe." }. If the ingredients ARE edible, your primary goal is to identify a well-known, classic recipe that can be made using these ingredients. Do not invent a new recipe if a classic one fits. If no classic recipe is a direct match, your secondary goal is to create a new recipe that is closely inspired by a classic dish, using ONLY the ingredients provided. In your response, only list the ingredients from the user's list that are actually used in the recipe. Respond ONLY with a valid JSON object with the following strict structure: { "title": "Recipe Title", "description": "A short, enticing description of the dish. If it's not a classic recipe, mention which classic dish it is similar to.", "ingredients": ["ingredient 1 from user's list", "ingredient 2 from user's list"], "instructions": ["Step 1 of the recipe", "Step 2", "etc."] }`;
+
 
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
