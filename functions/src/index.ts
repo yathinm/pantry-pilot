@@ -3,6 +3,11 @@ import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions";
 import OpenAI from "openai";
 
+import * as admin from "firebase-admin";
+
+admin.initializeApp();
+const db = admin.firestore()
+
 interface RequestData {
   ingredients: string;
 }
@@ -28,6 +33,7 @@ export const generateRecipe = onCall({ secrets: [OPENAI_API_KEY_SECRET] }, async
     }
 
     const data = request.data as RequestData;
+    const uid = request.auth.uid;
     const { ingredients } = data;
 
     if (!ingredients || typeof ingredients !== "string" || ingredients.trim() === "") {
@@ -36,6 +42,24 @@ export const generateRecipe = onCall({ secrets: [OPENAI_API_KEY_SECRET] }, async
         "invalid-argument",
         "The function must be called with an 'ingredients' property."
       );
+    }
+
+    try {
+      const ingredientArray = ingredients.toLowerCase().split(/[\s,]+/).filter(Boolean);
+
+      const updates: { [key: string]: admin.firestore.FieldValue } = {};
+      for (const ingredient of ingredientArray) {
+        updates[`ingredientFrequency.${ingredient}`] = admin.firestore.FieldValue.increment(1);
+      }
+      
+      if (Object.keys(updates).length > 0) {
+        const userDocRef = db.collection('users').doc(uid);
+        await userDocRef.update(updates);
+        logger.info(`Updated ingredient counts for user ${uid}`, updates);
+      }
+    } catch (err) {
+
+      logger.error(`Failed to update ingredient frequency for user ${uid}`, err);
     }
 
     logger.info("v2 Function called with ingredients:", ingredients);

@@ -16,6 +16,8 @@ import { useAuth } from '../auth/AuthContext';
 import { signOut } from 'firebase/auth';
 import { auth, app } from '../firebase'; 
 import { getFunctions, httpsCallable } from 'firebase/functions';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../firebase';
 
 interface HomePageProps {
   setPage: (page: string) => void;
@@ -34,10 +36,13 @@ const HomePage: React.FC<HomePageProps> = ({ setPage }) => {
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isSaved, setIsSaved] = useState(false);
+
 
   const handleLogout = async () => {
     await signOut(auth);
   };
+  
 
   const handleGenerateRecipe = async () => {
     if (!ingredients || !user) return; 
@@ -45,6 +50,8 @@ const HomePage: React.FC<HomePageProps> = ({ setPage }) => {
     setLoading(true);
     setError('');
     setRecipe(null);
+    setRecipe(null);
+    setIsSaved(false);
 
     try {
       const functions = getFunctions(app, 'us-central1');
@@ -60,11 +67,34 @@ const HomePage: React.FC<HomePageProps> = ({ setPage }) => {
     }
   };
 
+  
+const handleSaveRecipe = async () => {
+  if (!user || !recipe) {
+    console.error("No user or recipe to save.");
+    return;
+  }
+
+  try {
+    const recipesCollectionRef = collection(db, 'users', user.uid, 'recipes');
+
+    await addDoc(recipesCollectionRef, {
+      ...recipe, 
+      savedAt: serverTimestamp(),
+    });
+
+    setIsSaved(true);
+
+  } catch (err) {
+    console.error("Error saving recipe: ", err);
+    setError("Sorry, we couldn't save your recipe right now.");
+  }
+};
+
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', mb: 4 }}>
         <Typography variant="h6">
-          Welcome, <strong>{user?.displayName || user?.email}</strong>!
+          Welcome to Pantry Pilot, <strong>{user?.displayName || user?.email}</strong>!
         </Typography>
         <Box sx={{ display: 'flex', gap: 2 }}>
           <Button variant="outlined" onClick={() => setPage('UserProfilePage')}>My Profile</Button>
@@ -101,7 +131,16 @@ const HomePage: React.FC<HomePageProps> = ({ setPage }) => {
       {recipe && (
         <Box sx={{ mt: 4 }}>
           <Divider sx={{ mb: 4 }} />
-          <Typography variant="h4" component="h2" sx={{ fontWeight: 'bold' }}>{recipe.title}</Typography>
+          <Typography variant="h4" component="h2" sx={{ fontWeight: 'bold' }}>{recipe.title}
+            <Button
+                variant="contained"
+                color="secondary"
+                onClick={handleSaveRecipe}
+                disabled={isSaved}
+            >
+                {isSaved ? 'Recipe Saved!' : 'Save This Recipe'}
+            </Button>
+          </Typography>
           <Typography sx={{ my: 2 }} color="text.secondary">{recipe.description}</Typography>
           
           {recipe.ingredients && recipe.instructions && (
