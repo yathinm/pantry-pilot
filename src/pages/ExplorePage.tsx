@@ -1,4 +1,5 @@
 // src/pages/ExplorePage.tsx
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -18,14 +19,18 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  CardActions,
 } from '@mui/material';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import { useAuth } from '../auth/AuthContext';
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import { app } from '../firebase';
+import { app, db } from '../firebase';
+import { collection, addDoc, serverTimestamp, getDocs, query } from 'firebase/firestore';
+
 
 interface ExplorePageProps {
   setPage: (page: string) => void;
@@ -45,111 +50,106 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ setPage }) => {
   const [selectedRecipe, setSelectedRecipe] = useState<RecommendedRecipe | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
+  
+  const [savedRecipeTitles, setSavedRecipeTitles] = useState<Set<string>>(new Set());
   useEffect(() => {
-    const fetchRecommendations = async () => {
+    const fetchInitialData = async () => {
       if (!user) {
         setLoading(false);
-        setError("You must be logged in to see recommendations.");
+        setError("You must be logged in.");
         return;
       }
       try {
         setLoading(true);
         setError('');
+
+        const savedRecipesQuery = query(collection(db, 'users', user.uid, 'recipes'));
+        const querySnapshot = await getDocs(savedRecipesQuery);
+        const titles = new Set(querySnapshot.docs.map(doc => doc.data().title));
+        setSavedRecipeTitles(titles);
+
         const functions = getFunctions(app, 'us-central1');
         const getRecommendedRecipesFn = httpsCallable(functions, 'getRecommendedRecipes');
         const result = await getRecommendedRecipesFn();
-        const recommendedData = result.data as RecommendedRecipe[];
-        setRecommendations(recommendedData);
+        setRecommendations(result.data as RecommendedRecipe[]);
+
       } catch (err: any) {
-        console.error("Error fetching recommendations:", err);
+        console.error("Error fetching initial data:", err);
         setError(`Error: ${err.message}`);
       } finally {
         setLoading(false);
       }
     };
-    fetchRecommendations();
+    fetchInitialData();
   }, [user]);
 
-  const handleNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % recommendations.length);
-  };
+  const handleNext = () => setCurrentIndex((prev) => (prev + 1) % recommendations.length);
+  const handleBack = () => setCurrentIndex((prev) => (prev - 1 + recommendations.length) % recommendations.length);
+  const handleRecipeClick = (recipe: RecommendedRecipe) => setSelectedRecipe(recipe);
+  const handleCloseDialog = () => setSelectedRecipe(null);
 
-  const handleBack = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + recommendations.length) % recommendations.length);
-  };
-  
-  const handleRecipeClick = (recipe: RecommendedRecipe) => {
-    setSelectedRecipe(recipe);
-  };
-  
-  const handleCloseDialog = () => {
-    setSelectedRecipe(null);
+  const handleSaveRecipe = async (recipeToSave: RecommendedRecipe) => {
+    if (!user || !recipeToSave) return;
+    try {
+      const recipesCollectionRef = collection(db, 'users', user.uid, 'recipes');
+      await addDoc(recipesCollectionRef, {
+        ...recipeToSave,
+        savedAt: serverTimestamp(),
+      });
+      setSavedRecipeTitles(prev => new Set(prev).add(recipeToSave.title));
+    } catch (err) {
+      console.error("Error saving recipe:", err);
+      setError("Failed to save recipe.");
+    }
   };
 
   const currentRecipe = recommendations[currentIndex];
 
   return (
     <>
-      <Box>
+      <Paper sx={{ p: { xs: 2, md: 4 }, width: '100%', maxWidth: 800, minHeight: 400 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
-            Explore Recipes
-          </Typography>
-          <Button variant="outlined" onClick={() => setPage('home')}>
-            Back to Generator
-          </Button>
+          <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>Explore Recipes</Typography>
+          <Button variant="outlined" onClick={() => setPage('home')}>Back to Generator</Button>
         </Box>
         <Typography color="text.secondary" sx={{ mb: 3 }}>
           Based on your most used ingredients, here are some new ideas you might like!
         </Typography>
 
-        {loading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-            <CircularProgress />
-          </Box>
-        )}
-
-        {error && (
-          <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>
-        )}
+        {loading && <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}><CircularProgress /></Box>}
+        {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
 
         {!loading && !error && currentRecipe && (
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-            <IconButton onClick={handleBack} disabled={recommendations.length <= 1}>
-              <ArrowBackIosNewIcon />
-            </IconButton>
-            <Card 
-              variant="outlined" 
-              sx={{ flexGrow: 1, minHeight: 150 }}
-            >
-              <CardActionArea onClick={() => handleRecipeClick(currentRecipe)} sx={{ height: '100%', p: 2 }}>
+            <IconButton onClick={handleBack} disabled={recommendations.length <= 1}><ArrowBackIosNewIcon /></IconButton>
+            <Card variant="outlined" sx={{ flexGrow: 1, minHeight: 150, display: 'flex', flexDirection: 'column' }}>
+              <CardActionArea onClick={() => handleRecipeClick(currentRecipe)} sx={{ flexGrow: 1 }}>
                 <CardContent>
                   <Typography variant="h5" component="div" gutterBottom>{currentRecipe.title}</Typography>
                   <Typography variant="body2" color="text.secondary">{currentRecipe.description}</Typography>
                 </CardContent>
               </CardActionArea>
+              <CardActions sx={{ justifyContent: 'flex-end', p: 2 }}>
+                <Button
+                  variant="text"
+                  startIcon={<BookmarkAddIcon />}
+                  onClick={() => handleSaveRecipe(currentRecipe)}
+                  disabled={savedRecipeTitles.has(currentRecipe.title)}
+                >
+                  {savedRecipeTitles.has(currentRecipe.title) ? 'Saved' : 'Save Recipe'}
+                </Button>
+              </CardActions>
             </Card>
-            <IconButton onClick={handleNext} disabled={recommendations.length <= 1}>
-              <ArrowForwardIosIcon />
-            </IconButton>
+            <IconButton onClick={handleNext} disabled={recommendations.length <= 1}><ArrowForwardIosIcon /></IconButton>
           </Box>
         )}
-         {!loading && !error && recommendations.length === 0 && (
-            <Typography textAlign="center" color="text.secondary" sx={{mt: 4}}>
-              No recommendations available yet. Try generating more recipes to build your taste profile!
-            </Typography>
-         )}
-      </Box>
+        {!loading && !error && recommendations.length === 0 && <Typography textAlign="center" color="text.secondary" sx={{mt: 4}}>No recommendations yet.</Typography>}
+      </Paper>
 
       <Dialog open={Boolean(selectedRecipe)} onClose={handleCloseDialog} maxWidth="md" fullWidth>
         <DialogTitle sx={{ fontWeight: 'bold' }}>
           {selectedRecipe?.title}
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseDialog}
-            sx={{ position: 'absolute', right: 8, top: 8 }}
-          >
+          <IconButton aria-label="close" onClick={handleCloseDialog} sx={{ position: 'absolute', right: 8, top: 8 }}>
             <CloseIcon />
           </IconButton>
         </DialogTitle>
@@ -183,6 +183,7 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ setPage }) => {
           </Box>
         </DialogContent>
       </Dialog>
+      
     </>
   );
 };

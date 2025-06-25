@@ -100,7 +100,7 @@ const handleSaveRecipe = async () => {
         <Button variant="outlined" onClick={() => setPage('ExplorePage')}>
           Explore
         </Button>
-        <Button variant="outlined" onClick={() => setPage('profile')}>
+        <Button variant="outlined" onClick={() => setPage('UserProfilePage')}>
           My Profile
         </Button>
         <Button variant="contained" onClick={handleLogout}>
