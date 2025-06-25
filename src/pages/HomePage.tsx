@@ -97,9 +97,17 @@ const handleSaveRecipe = async () => {
           Welcome to Pantry Pilot, <strong>{user?.displayName || user?.email}</strong>!
         </Typography>
         <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button variant="outlined" onClick={() => setPage('UserProfilePage')}>My Profile</Button>
-          <Button variant="contained" onClick={handleLogout}>Log Out</Button>
-        </Box>
+        {/* THIS IS THE NEW BUTTON */}
+        <Button variant="outlined" onClick={() => setPage('ExplorePage')}>
+          Explore
+        </Button>
+        <Button variant="outlined" onClick={() => setPage('profile')}>
+          My Profile
+        </Button>
+        <Button variant="contained" onClick={handleLogout}>
+          Log Out
+        </Button>
+      </Box>
       </Box>
 
       <Box>

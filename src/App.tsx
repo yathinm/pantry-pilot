@@ -7,6 +7,7 @@ import LoginPage from './components/LoginPage';
 import SignupPage from './components/SignupPage';
 import HomePage from './pages/HomePage';
 import UserProfilePage from './pages/UserProfilePage';
+import ExplorePage from './pages/ExplorePage';
 import { AuthProvider, useAuth } from './auth/AuthContext';
 
 function AppContent() {
@@ -18,6 +19,8 @@ function AppContent() {
   }
   if (user) {
     switch (page) {
+      case 'ExplorePage':
+        return <ExplorePage setPage={setPage} />; 
       case 'UserProfilePage':
         return <UserProfilePage setPage={setPage} />; 
       

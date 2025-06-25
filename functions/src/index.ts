@@ -1,4 +1,3 @@
-
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions";
 import OpenAI from "openai";
@@ -91,6 +90,71 @@ export const generateRecipe = onCall({ secrets: [OPENAI_API_KEY_SECRET] }, async
     throw new HttpsError(
       "internal",
       "An unexpected error occurred."
+    );
+  }
+});
+
+
+const OPENAI_API_KEY_SECRET_REC = "OPENAI_API_KEY"; 
+
+export const getRecommendedRecipes = onCall({ secrets: [OPENAI_API_KEY_SECRET_REC] }, async (request) => {
+  try {
+    if (!process.env.OPENAI_API_KEY) {
+      logger.error("FATAL: OPENAI_API_KEY environment variable not set.");
+      throw new HttpsError("internal", "Server configuration error: API key not found.");
+    }
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "You must be logged in to use this feature.");
+    }
+    const uid = request.auth.uid;
+
+    const userDocRef = admin.firestore().collection('users').doc(uid);
+    const userDoc = await userDocRef.get();
+
+    if (!userDoc.exists) {
+      throw new HttpsError("not-found", "User data not found.");
+    }
+
+    const userData = userDoc.data();
+    const ingredientFrequency = userData?.ingredientFrequency || {};
+
+    const topIngredients = Object.entries(ingredientFrequency)
+      .sort(([, a], [, b]) => (b as number) - (a as number))
+      .slice(0, 3)
+      .map(([name]) => name);
+
+    if (topIngredients.length === 0) {
+      topIngredients.push("chicken", "rice", "cheese"); 
+    }
+
+    logger.info(`Generating recommendations for user ${uid} based on top ingredients:`, topIngredients);
+
+    const prompt = `You are a recipe recommender. A user frequently cooks with the following ingredients: ${topIngredients.join(', ')}. Your task is to suggest 3 new and interesting, but not overly complex, recipes they might enjoy. For each recipe, provide a title, a short description, a list of ingredients, and step-by-step instructions. Respond ONLY with a valid JSON object with the following strict structure: { "recommendations": [{ "title": "Recipe Title 1", "description": "A short description.", "ingredients": ["Ingredient 1", "Ingredient 2"], "instructions": ["Step 1", "Step 2"] }] }`;
+    
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
+    });
+
+    const responseJsonString = completion.choices[0].message.content;
+    if (!responseJsonString) {
+      throw new Error("OpenAI did not return recommendations.");
+    }
+
+    const parsedResponse = JSON.parse(responseJsonString);
+    return parsedResponse.recommendations;
+
+  } catch (error) {
+    logger.error("Unhandled error in getRecommendedRecipes function:", error);
+    if (error instanceof HttpsError) {
+      throw error;
+    }
+    throw new HttpsError(
+      "internal",
+      "An unexpected error occurred while generating recommendations."
     );
   }
 });
