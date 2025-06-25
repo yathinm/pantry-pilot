@@ -10,6 +10,8 @@ import {
   Typography,
   Alert,
   CircularProgress,
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
 import {
@@ -18,6 +20,8 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { auth, provider } from '../firebase';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 interface SignupPageProps {
   setPage: (page: string) => void;
@@ -38,6 +42,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
   const [lastName, setLastName] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleEmailSignup = async () => {
     setErrorMsg('');
@@ -83,6 +88,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
             display: 'flex',
             flexDirection: 'column',
             gap: 2,
+            fontFamily: 'Nunito, sans-serif',
           }}
         >
           <Typography variant="h4" sx={{ fontWeight: 'bold', textAlign: 'center', mb: 1, letterSpacing: 1, fontFamily: 'Nunito, sans-serif' }}>
@@ -115,8 +121,8 @@ const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
 
           <Divider sx={{ my: 2, fontFamily: 'Nunito, sans-serif' }}>or</Divider>
 
-          <Stack spacing={2}>
-            <Stack direction="row" spacing={2}>
+          <Stack spacing={2} sx={{ fontFamily: 'Nunito, sans-serif' }}>
+            <Stack direction="row" spacing={2} sx={{ fontFamily: 'Nunito, sans-serif' }}>
               <TextField
                 label="First Name"
                 fullWidth
@@ -149,13 +155,28 @@ const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
             />
             <TextField
               label="Password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               fullWidth
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="new-password"
               InputLabelProps={{ style: { fontFamily: 'Nunito, sans-serif' } }}
               inputProps={{ style: { fontFamily: 'Nunito, sans-serif' } }}
+              helperText="Password must be at least 6 characters."
+              FormHelperTextProps={{ style: { fontFamily: 'Nunito, sans-serif' } }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      onClick={() => setShowPassword((show) => !show)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
           </Stack>
 
@@ -176,12 +197,34 @@ const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
             </Alert>
           )}
 
-          <Typography variant="body2" textAlign="center" sx={{ mt: 3, color: 'text.secondary', fontFamily: 'Nunito, sans-serif' }}>
-            Already have an account?{' '}
-            <Button size="small" onClick={() => setPage('login')} sx={{ textTransform: 'none', fontWeight: 500, fontFamily: 'Nunito, sans-serif' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 4, gap: 1 }}>
+            <Typography variant="body1" sx={{ fontWeight: 700, fontSize: '1.08rem', fontFamily: 'Nunito, sans-serif', color: 'text.primary' }}>
+              Already have an account?
+            </Typography>
+            <Button
+              size="medium"
+              variant="outlined"
+              color="primary"
+              onClick={() => setPage('login')}
+              sx={{
+                textTransform: 'none',
+                fontWeight: 700,
+                fontFamily: 'Nunito, sans-serif',
+                borderWidth: 2,
+                borderRadius: 2,
+                ml: 1,
+                px: 2.5,
+                boxShadow: 'none',
+                '&:hover': {
+                  backgroundColor: 'primary.main',
+                  color: 'white',
+                  borderColor: 'primary.main',
+                },
+              }}
+            >
               Log in
             </Button>
-          </Typography>
+          </Box>
         </Box>
       </Paper>
     </Container>
