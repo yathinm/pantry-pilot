@@ -1,5 +1,4 @@
 // src/pages/ExplorePage.tsx
-
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -32,7 +31,6 @@ interface ExplorePageProps {
   setPage: (page: string) => void;
 }
 
-// Updated interface to include the full recipe details
 interface RecommendedRecipe {
   title: string;
   description: string;
@@ -144,7 +142,6 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ setPage }) => {
          )}
       </Box>
 
-      {/* The Dialog component for displaying recipe details */}
       <Dialog open={Boolean(selectedRecipe)} onClose={handleCloseDialog} maxWidth="md" fullWidth>
         <DialogTitle sx={{ fontWeight: 'bold' }}>
           {selectedRecipe?.title}

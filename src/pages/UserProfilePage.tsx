@@ -31,7 +31,6 @@ interface UserProfilePageProps {
   setPage: (page: string) => void;
 }
 
-// Define a type for our saved recipe data, including its ID
 interface SavedRecipe {
   id: string;
   title: string;

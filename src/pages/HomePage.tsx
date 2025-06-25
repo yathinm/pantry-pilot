@@ -97,7 +97,6 @@ const handleSaveRecipe = async () => {
           Welcome to Pantry Pilot, <strong>{user?.displayName || user?.email}</strong>!
         </Typography>
         <Box sx={{ display: 'flex', gap: 2 }}>
-        {/* THIS IS THE NEW BUTTON */}
         <Button variant="outlined" onClick={() => setPage('ExplorePage')}>
           Explore
         </Button>
