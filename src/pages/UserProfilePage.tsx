@@ -14,19 +14,17 @@ import {
   ListItemText,
   Card,
   CardContent,
-  // NEW: Import components for the dialog popup
   Dialog,
   DialogTitle,
   DialogContent,
   IconButton,
   ListItemIcon,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close'; // NEW: Import close icon
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'; // NEW: Import check icon
+import CloseIcon from '@mui/icons-material/Close'; 
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { useAuth } from '../auth/AuthContext';
 import { signOut } from 'firebase/auth';
 import { auth, db } from '../firebase';
-// Import all the necessary firestore functions
 import { doc, getDoc, collection, getDocs, Timestamp, query, orderBy } from 'firebase/firestore';
 
 interface UserProfilePageProps {
@@ -38,7 +36,6 @@ interface SavedRecipe {
   id: string;
   title: string;
   description: string;
-  // NEW: Add ingredients and instructions to the type
   ingredients: string[];
   instructions: string[];
 }
@@ -49,7 +46,6 @@ const UserProfilePage: React.FC<UserProfilePageProps> = ({ setPage }) => {
   const [savedRecipes, setSavedRecipes] = useState<SavedRecipe[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // NEW: State to manage the selected recipe for the dialog
   const [selectedRecipe, setSelectedRecipe] = useState<SavedRecipe | null>(null);
 
   useEffect(() => {
@@ -59,7 +55,6 @@ const UserProfilePage: React.FC<UserProfilePageProps> = ({ setPage }) => {
         return;
       }
       try {
-        // ... (The existing data fetching logic remains the same)
         const userDocRef = doc(db, 'users', user.uid);
         const docSnap = await getDoc(userDocRef);
         if (docSnap.exists()) {
