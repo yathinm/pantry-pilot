@@ -205,7 +205,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
               size="medium"
               variant="outlined"
               color="primary"
-              onClick={() => setPage('login')}
+              onClick={() => setPage('LoginPage')}
               sx={{
                 textTransform: 'none',
                 fontWeight: 700,

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Box, CircularProgress } from '@mui/material';
 
+import Welcome from './components/Welcome';
 import LoginPage from './components/LoginPage';
 import SignupPage from './components/SignupPage';
 import HomePage from './pages/HomePage';
@@ -12,7 +13,7 @@ import { AuthProvider, useAuth } from './auth/AuthContext';
 
 function AppContent() {
   const { user, loading } = useAuth();
-  const [page, setPage] = useState('login'); 
+  const [page, setPage] = useState('welcome'); 
 
   if (loading) {
     return <CircularProgress />;
@@ -32,10 +33,11 @@ function AppContent() {
   switch (page) {
     case 'SignupPage':
       return <SignupPage setPage={setPage} />;
-    
     case 'LoginPage':
-    default:
       return <LoginPage setPage={setPage} />;
+    case 'welcome':
+    default:
+      return <Welcome setPage={setPage} />;
   }
   
 }
@@ -49,7 +51,7 @@ function App() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          bgcolor: 'grey.100',
+          bgcolor: '#f7f7fa',
         }}
       >
         <AppContent />
