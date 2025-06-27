@@ -1,7 +1,7 @@
 // src/App.tsx
 
 import React, { useState } from 'react';
-import { Box, CircularProgress } from '@mui/material';
+import { Box } from '@mui/material';
 
 import Welcome from './components/Welcome';
 import LoginPage from './components/LoginPage';
@@ -16,7 +16,26 @@ function AppContent() {
   const [page, setPage] = useState('welcome'); 
 
   if (loading) {
-    return <CircularProgress />;
+    return (
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f7f7fa' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+          <Box
+            sx={{
+              width: 60,
+              height: 60,
+              borderRadius: '50%',
+              border: '6px solid #e0e0e0',
+              borderTop: '6px solid #667eea',
+              animation: 'spin 1s linear infinite',
+              '@keyframes spin': {
+                '0%': { transform: 'rotate(0deg)' },
+                '100%': { transform: 'rotate(360deg)' },
+              },
+            }}
+          />
+        </Box>
+      </Box>
+    );
   }
   if (user) {
     switch (page) {

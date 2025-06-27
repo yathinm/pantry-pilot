@@ -4,7 +4,6 @@ import {
   Button,
   Typography,
   TextField,
-  CircularProgress,
   Divider,
   List,
   ListItem,
@@ -223,7 +222,20 @@ const HomePage: React.FC<HomePageProps> = ({ setPage }) => {
         >
           {loading ? (
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-              <CircularProgress size={22} thickness={4} sx={{ color: '#fff' }} />
+              <Box
+                sx={{
+                  width: 22,
+                  height: 22,
+                  borderRadius: '50%',
+                  border: '3px solid #e0e0e0',
+                  borderTop: '3px solid #fff',
+                  animation: 'spin 1s linear infinite',
+                  '@keyframes spin': {
+                    '0%': { transform: 'rotate(0deg)' },
+                    '100%': { transform: 'rotate(360deg)' },
+                  },
+                }}
+              />
             </Box>
           ) : (
             'Generate Recipe'

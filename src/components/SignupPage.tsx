@@ -8,7 +8,6 @@ import {
   TextField,
   Typography,
   Alert,
-  CircularProgress,
   IconButton,
   InputAdornment,
 } from '@mui/material';
@@ -231,7 +230,26 @@ const SignupPage: React.FC<SignupPageProps> = ({ setPage }) => {
           onClick={handleEmailSignup}
           sx={{ py: 1.3, textTransform: 'none', mt: 2, fontWeight: 600, fontFamily: 'Nunito, sans-serif', borderRadius: 2, background: '#667eea', boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)', '&:hover': { background: '#5a6fd8', transform: 'translateY(-1px)', boxShadow: '0 6px 20px rgba(102, 126, 234, 0.4)' } }}
         >
-          {loading ? <CircularProgress size={24} color="inherit" /> : 'Create Account'}
+          {loading ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+              <Box
+                sx={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: '50%',
+                  border: '3px solid #e0e0e0',
+                  borderTop: '3px solid #fff',
+                  animation: 'spin 1s linear infinite',
+                  '@keyframes spin': {
+                    '0%': { transform: 'rotate(0deg)' },
+                    '100%': { transform: 'rotate(360deg)' },
+                  },
+                }}
+              />
+            </Box>
+          ) : (
+            'Create Account'
+          )}
         </Button>
         {errorMsg && (
           <Alert severity="error" sx={{ mt: 2, textAlign: 'center', fontFamily: 'Nunito, sans-serif' }}>

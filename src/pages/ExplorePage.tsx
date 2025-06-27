@@ -5,11 +5,7 @@ import {
   Box,
   Button,
   Typography,
-  Paper,
   CircularProgress,
-  Card,
-  CardActionArea,
-  CardContent,
   Alert,
   IconButton,
   Dialog,
@@ -19,9 +15,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  CardActions,
   Container,
-  Divider,
 } from '@mui/material';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
@@ -100,7 +94,7 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ setPage }) => {
         savedAt: serverTimestamp(),
       });
       setSavedRecipeTitles(prev => new Set(prev).add(recipeToSave.title));
-    } catch (err) {
+    } catch {
       setError("Failed to save recipe.");
     }
   };
@@ -135,127 +129,282 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ setPage }) => {
   if (loading) {
     return (
       <Container maxWidth="md" sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f7f7fa' }}>
-        <CircularProgress />
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+          <Box
+            sx={{
+              width: 60,
+              height: 60,
+              borderRadius: '50%',
+              border: '6px solid #e0e0e0',
+              borderTop: '6px solid #667eea',
+              animation: 'spin 1s linear infinite',
+              '@keyframes spin': {
+                '0%': { transform: 'rotate(0deg)' },
+                '100%': { transform: 'rotate(360deg)' },
+              },
+            }}
+          />
+          <Typography sx={{ fontFamily: 'Nunito, sans-serif', color: '#667eea', fontWeight: 700, mt: 2 }}>Loading recipes...</Typography>
+        </Box>
       </Container>
     );
   }
 
   return (
-    <Container maxWidth="md" sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f7f7fa', fontFamily: 'Nunito, sans-serif' }}>
-      <Paper elevation={4} sx={{ p: { xs: 2, sm: 4 }, width: '100%', borderRadius: 3 }}>
-        <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2, fontFamily: 'Nunito, sans-serif' }}>
-          {/* Nav Bar */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', mb: 3, gap: 2 }}>
-            <Typography variant="h5" sx={{ fontWeight: 'bold', fontFamily: 'Nunito, sans-serif', letterSpacing: 1 }}>
-              Pantry Pilot
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button variant="outlined" onClick={() => setPage('HomePage')} sx={{ fontFamily: 'Nunito, sans-serif', fontWeight: 600, textTransform: 'none', px: 2 }}>
-                Home
-              </Button>
-              <Button variant="outlined" onClick={() => setPage('UserProfilePage')} sx={{ fontFamily: 'Nunito, sans-serif', fontWeight: 600, textTransform: 'none', px: 2 }}>
-                My Profile
-              </Button>
-            </Box>
-          </Box>
-
-          <Divider sx={{ my: 1, fontFamily: 'Nunito, sans-serif' }} />
-
-          <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', textAlign: 'center', mb: 1, fontFamily: 'Nunito, sans-serif' }}>
-            Explore Recipes
+    <Container maxWidth="md" sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f7f7fa' }}>
+      <Box sx={{
+        width: '100%',
+        maxWidth: 800,
+        mx: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 4,
+        fontFamily: 'Nunito, sans-serif',
+        textAlign: 'center',
+      }}>
+        {/* Nav Bar */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', mb: 2, gap: 2 }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, fontFamily: 'Nunito, sans-serif', letterSpacing: 1, color: '#667eea' }}>
+            Pantry Pilot
           </Typography>
-
-          <Typography variant="subtitle1" sx={{ textAlign: 'center', color: 'text.secondary', mb: 3, fontFamily: 'Nunito, sans-serif' }}>
-            Based on your most used ingredients, here are some new ideas you might like!
-          </Typography>
-
-          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-            <Button
-              variant="outlined"
-              onClick={handleRefreshRecipes}
-              disabled={loading}
-              sx={{ fontFamily: 'Nunito, sans-serif', fontWeight: 600, textTransform: 'none', px: 3 }}
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button 
+              variant="outlined" 
+              onClick={() => setPage('HomePage')} 
+              sx={{ 
+                fontFamily: 'Nunito, sans-serif', 
+                fontWeight: 700, 
+                textTransform: 'none', 
+                px: 2.5,
+                borderWidth: 2,
+                borderRadius: 2,
+                boxShadow: 'none',
+                color: '#667eea',
+                border: '2px solid #667eea',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  background: '#f7f7fa',
+                  color: '#5a6fd8',
+                  border: '2px solid #5a6fd8',
+                  transform: 'translateY(-1px)',
+                  boxShadow: '0 4px 15px rgba(102, 126, 234, 0.1)',
+                },
+              }}
             >
-              {loading ? <CircularProgress size={20} /> : 'Get More Recipes'}
+              Home
+            </Button>
+            <Button 
+              variant="outlined" 
+              onClick={() => setPage('UserProfilePage')} 
+              sx={{ 
+                fontFamily: 'Nunito, sans-serif', 
+                fontWeight: 700, 
+                textTransform: 'none', 
+                px: 2.5,
+                borderWidth: 2,
+                borderRadius: 2,
+                boxShadow: 'none',
+                color: '#667eea',
+                border: '2px solid #667eea',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  background: '#f7f7fa',
+                  color: '#5a6fd8',
+                  border: '2px solid #5a6fd8',
+                  transform: 'translateY(-1px)',
+                  boxShadow: '0 4px 15px rgba(102, 126, 234, 0.1)',
+                },
+              }}
+            >
+              My Profile
             </Button>
           </Box>
-
-          {error && <Alert severity="error" sx={{ mt: 2, textAlign: 'center', fontFamily: 'Nunito, sans-serif' }}>{error}</Alert>}
-
-          {!loading && !error && currentRecipe && (
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-              <IconButton onClick={handleBack} disabled={recommendations.length <= 1} sx={{ fontFamily: 'Nunito, sans-serif' }}>
-                <ArrowBackIosNewIcon />
-              </IconButton>
-              <Card variant="outlined" sx={{ flexGrow: 1, minHeight: 150, display: 'flex', flexDirection: 'column', fontFamily: 'Nunito, sans-serif' }}>
-                <CardActionArea onClick={() => handleRecipeClick(currentRecipe)} sx={{ flexGrow: 1 }}>
-                  <CardContent>
-                    <Typography variant="h5" component="div" gutterBottom sx={{ fontFamily: 'Nunito, sans-serif' }}>
-                      {currentRecipe.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ fontFamily: 'Nunito, sans-serif' }}>
-                      {currentRecipe.description}
-                    </Typography>
-                  </CardContent>
-                </CardActionArea>
-                <CardActions sx={{ justifyContent: 'flex-end', p: 2 }}>
-                  <Button
-                    variant="outlined"
-                    startIcon={<BookmarkAddIcon />}
-                    onClick={() => handleSaveRecipe(currentRecipe)}
-                    disabled={savedRecipeTitles.has(currentRecipe.title)}
-                    sx={{ fontFamily: 'Nunito, sans-serif', fontWeight: 600, textTransform: 'none' }}
-                  >
-                    {savedRecipeTitles.has(currentRecipe.title) ? 'Saved' : 'Save Recipe'}
-                  </Button>
-                </CardActions>
-              </Card>
-              <IconButton onClick={handleNext} disabled={recommendations.length <= 1} sx={{ fontFamily: 'Nunito, sans-serif' }}>
-                <ArrowForwardIosIcon />
-              </IconButton>
-            </Box>
-          )}
-          {!loading && !error && recommendations.length === 0 && (
-            <Typography textAlign="center" color="text.secondary" sx={{ mt: 4, fontFamily: 'Nunito, sans-serif' }}>
-              No recommendations yet.
-            </Typography>
-          )}
         </Box>
-      </Paper>
+
+        <Typography
+          variant="h2"
+          sx={{
+            fontWeight: 800,
+            letterSpacing: 2,
+            fontFamily: 'Nunito, sans-serif',
+            color: '#667eea',
+            mb: 1,
+            animation: 'float 3s ease-in-out infinite',
+            '@keyframes float': {
+              '0%, 100%': {
+                transform: 'translateY(0px)',
+              },
+              '50%': {
+                transform: 'translateY(-10px)',
+              },
+            },
+          }}
+        >
+          Explore Recipes
+        </Typography>
+
+        <Typography variant="subtitle1" sx={{ textAlign: 'center', color: 'text.secondary', mb: 3, fontFamily: 'Nunito, sans-serif', opacity: 0.8 }}>
+          Based on your most used ingredients, here are some new ideas you might like!
+        </Typography>
+
+        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+          <Button
+            variant="outlined"
+            onClick={handleRefreshRecipes}
+            disabled={loading}
+            sx={{
+              fontFamily: 'Nunito, sans-serif',
+              fontWeight: 700,
+              textTransform: 'none',
+              px: 3,
+              borderWidth: 2,
+              borderRadius: 2,
+              boxShadow: 'none',
+              color: '#667eea',
+              border: '2px solid #667eea',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                background: '#f7f7fa',
+                color: '#5a6fd8',
+                border: '2px solid #5a6fd8',
+                transform: 'translateY(-1px)',
+                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.1)',
+              },
+            }}
+          >
+            {loading ? <CircularProgress size={20} /> : 'Get More Recipes'}
+          </Button>
+        </Box>
+
+        {error && <Alert severity="error" sx={{ mt: 2, textAlign: 'center', fontFamily: 'Nunito, sans-serif' }}>{error}</Alert>}
+
+        {!loading && !error && currentRecipe && (
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, width: '100%' }}>
+            <IconButton onClick={handleBack} disabled={recommendations.length <= 1} sx={{ fontFamily: 'Nunito, sans-serif' }}>
+              <ArrowBackIosNewIcon />
+            </IconButton>
+            <Box
+              sx={{
+                flexGrow: 1,
+                minHeight: 150,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                justifyContent: 'center',
+                background: '#f7f7fa',
+                border: '1.5px solid #e0e0e0',
+                borderRadius: 3,
+                p: 3,
+                boxShadow: 'none',
+                transition: 'box-shadow 0.2s',
+                '&:hover': { boxShadow: '0 2px 12px rgba(102, 126, 234, 0.08)' },
+                fontFamily: 'Nunito, sans-serif',
+                width: '100%',
+                maxWidth: 600,
+                mx: 'auto',
+                cursor: 'pointer',
+              }}
+              onClick={() => handleRecipeClick(currentRecipe)}
+            >
+              <Typography variant="h5" sx={{ fontFamily: 'Nunito, sans-serif', fontWeight: 700, color: '#667eea', mb: 1 }}>{currentRecipe.title}</Typography>
+              <Typography sx={{ fontFamily: 'Nunito, sans-serif', color: 'text.secondary', mb: 2 }}>{currentRecipe.description}</Typography>
+              <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                <Button
+                  variant="outlined"
+                  startIcon={<BookmarkAddIcon />}
+                  onClick={e => { e.stopPropagation(); handleSaveRecipe(currentRecipe); }}
+                  disabled={savedRecipeTitles.has(currentRecipe.title)}
+                  sx={{
+                    fontFamily: 'Nunito, sans-serif',
+                    fontWeight: 700,
+                    textTransform: 'none',
+                    borderWidth: 2,
+                    borderRadius: 2,
+                    px: 3,
+                    boxShadow: 'none',
+                    color: '#667eea',
+                    border: '2px solid #667eea',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      background: '#f7f7fa',
+                      color: '#5a6fd8',
+                      border: '2px solid #5a6fd8',
+                      transform: 'translateY(-1px)',
+                      boxShadow: '0 4px 15px rgba(102, 126, 234, 0.1)',
+                    },
+                  }}
+                >
+                  {savedRecipeTitles.has(currentRecipe.title) ? 'Saved' : 'Save Recipe'}
+                </Button>
+              </Box>
+            </Box>
+            <IconButton onClick={handleNext} disabled={recommendations.length <= 1} sx={{ fontFamily: 'Nunito, sans-serif' }}>
+              <ArrowForwardIosIcon />
+            </IconButton>
+          </Box>
+        )}
+        {!loading && !error && recommendations.length === 0 && (
+          <Typography textAlign="center" color="text.secondary" sx={{ mt: 4, fontFamily: 'Nunito, sans-serif' }}>
+            No recommendations yet.
+          </Typography>
+        )}
+      </Box>
 
       <Dialog open={Boolean(selectedRecipe)} onClose={handleCloseDialog} maxWidth="md" fullWidth>
-        <DialogTitle sx={{ fontWeight: 'bold', fontFamily: 'Nunito, sans-serif' }}>
+        <DialogTitle sx={{ fontWeight: 800, fontFamily: 'Nunito, sans-serif', color: '#667eea' }}>
           {selectedRecipe?.title}
           <IconButton aria-label="close" onClick={handleCloseDialog} sx={{ position: 'absolute', right: 8, top: 8 }}>
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent dividers sx={{ fontFamily: 'Nunito, sans-serif' }}>
-          <Typography gutterBottom sx={{ fontFamily: 'Nunito, sans-serif' }}>{selectedRecipe?.description}</Typography>
+        <DialogContent dividers sx={{ fontFamily: 'Nunito, sans-serif', background: '#f7f7fa' }}>
+          <Typography gutterBottom sx={{ fontFamily: 'Nunito, sans-serif', color: 'text.secondary', opacity: 0.8 }}>{selectedRecipe?.description}</Typography>
           <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4, mt: 2 }}>
             <Box sx={{ flex: 1 }}>
-              <Typography variant="h6" gutterBottom sx={{ fontFamily: 'Nunito, sans-serif' }}>Ingredients</Typography>
+              <Typography variant="h6" gutterBottom sx={{ fontFamily: 'Nunito, sans-serif', fontWeight: 700, color: '#667eea' }}>Ingredients</Typography>
               <List dense>
                 {selectedRecipe?.ingredients?.map((item, index) => (
-                  <ListItem key={index}>
+                  <ListItem key={index} alignItems="flex-start">
+                    <ListItemIcon sx={{ minWidth: '40px', mt: '4px' }}>
+                      <Typography sx={{ fontWeight: 'bold', fontFamily: 'Nunito, sans-serif', color: '#667eea' }}>{index + 1}.</Typography>
+                    </ListItemIcon>
                     <ListItemText
-                      primary={<span style={{ fontFamily: 'Nunito, sans-serif' }}>{`${index + 1}. ${item}`}</span>}
+                      primary={item}
+                      sx={{
+                        fontFamily: 'Nunito, sans-serif',
+                        '& .MuiListItemText-primary': {
+                          fontFamily: 'Nunito, sans-serif',
+                          fontWeight: 400,
+                          lineHeight: 1.6,
+                        }
+                      }}
                     />
                   </ListItem>
                 ))}
               </List>
             </Box>
             <Box sx={{ flex: 2 }}>
-              <Typography variant="h6" gutterBottom sx={{ fontFamily: 'Nunito, sans-serif' }}>Instructions</Typography>
+              <Typography variant="h6" gutterBottom sx={{ fontFamily: 'Nunito, sans-serif', fontWeight: 700, color: '#667eea' }}>Instructions</Typography>
               <List>
                 {selectedRecipe?.instructions?.map((step, index) => {
                   const cleanStep = step.replace(/^\s*\d+\.?\s*/, '');
                   return (
                     <ListItem key={index} alignItems="flex-start">
                       <ListItemIcon sx={{ minWidth: '40px', mt: '4px' }}>
-                        <Typography sx={{ fontWeight: 'bold', fontFamily: 'Nunito, sans-serif' }}>{index + 1}.</Typography>
+                        <Typography sx={{ fontWeight: 'bold', fontFamily: 'Nunito, sans-serif', color: '#667eea' }}>{index + 1}.</Typography>
                       </ListItemIcon>
-                      <ListItemText primary={cleanStep} sx={{ fontFamily: 'Nunito, sans-serif' }} />
+                      <ListItemText
+                        primary={cleanStep}
+                        sx={{
+                          fontFamily: 'Nunito, sans-serif',
+                          '& .MuiListItemText-primary': {
+                            fontFamily: 'Nunito, sans-serif',
+                            fontWeight: 400,
+                            lineHeight: 1.6,
+                          }
+                        }}
+                      />
                     </ListItem>
                   );
                 })}
