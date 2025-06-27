@@ -1,6 +1,6 @@
 // src/App.tsx
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Box } from '@mui/material';
 
 import Welcome from './components/Welcome';
