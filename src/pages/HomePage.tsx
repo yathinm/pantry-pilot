@@ -11,7 +11,6 @@ import {
   ListItemIcon,
   ListItemText,
   Container,
-  Paper,
   Alert,
 } from '@mui/material';
 import { useAuth } from '../auth/AuthContext';
@@ -78,119 +77,238 @@ const HomePage: React.FC<HomePageProps> = ({ setPage }) => {
         savedAt: serverTimestamp(),
       });
       setIsSaved(true);
-    } catch (err) {
+    } catch {
       setError("Sorry, we couldn't save your recipe right now.");
     }
   };
 
   return (
-    <Container maxWidth="sm" sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f7f7fa', fontFamily: 'Nunito, sans-serif' }}>
-      <Paper elevation={4} sx={{ p: { xs: 2, sm: 4 }, width: '100%', borderRadius: 3 }}>
-        <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2, fontFamily: 'Nunito, sans-serif' }}>
-          {/* Nav Bar */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', mb: 3, gap: 2 }}>
-            <Typography variant="h5" sx={{ fontWeight: 'bold', fontFamily: 'Nunito, sans-serif', letterSpacing: 1 }}>
-              Pantry Pilot
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button variant="outlined" onClick={() => setPage('ExplorePage')} sx={{ fontFamily: 'Nunito, sans-serif', fontWeight: 600, textTransform: 'none', px: 2 }}>
-                Explore
-              </Button>
-              <Button variant="outlined" onClick={() => setPage('UserProfilePage')} sx={{ fontFamily: 'Nunito, sans-serif', fontWeight: 600, textTransform: 'none', px: 2 }}>
-                My Profile
-              </Button>
-              <Button variant="contained" onClick={handleLogout} sx={{ fontFamily: 'Nunito, sans-serif', fontWeight: 600, textTransform: 'none', px: 2 }}>
-                Log Out
+    <Container maxWidth="sm" sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f7f7fa' }}>
+      <Box sx={{ 
+        width: '100%', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: 4, 
+        fontFamily: 'Nunito, sans-serif',
+        textAlign: 'center'
+      }}>
+        {/* Nav Bar */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', mb: 2, gap: 2 }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, fontFamily: 'Nunito, sans-serif', letterSpacing: 1, color: '#667eea' }}>
+            Pantry Pilot
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button 
+              variant="outlined" 
+              onClick={() => setPage('ExplorePage')} 
+              sx={{ 
+                fontFamily: 'Nunito, sans-serif', 
+                fontWeight: 700, 
+                textTransform: 'none', 
+                px: 2.5,
+                borderWidth: 2,
+                borderRadius: 2,
+                boxShadow: 'none',
+                color: '#667eea',
+                border: '2px solid #667eea',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  background: '#f7f7fa',
+                  color: '#5a6fd8',
+                  border: '2px solid #5a6fd8',
+                  transform: 'translateY(-1px)',
+                  boxShadow: '0 4px 15px rgba(102, 126, 234, 0.1)',
+                },
+              }}
+            >
+              Explore
+            </Button>
+            <Button 
+              variant="outlined" 
+              onClick={() => setPage('UserProfilePage')} 
+              sx={{ 
+                fontFamily: 'Nunito, sans-serif', 
+                fontWeight: 700, 
+                textTransform: 'none', 
+                px: 2.5,
+                borderWidth: 2,
+                borderRadius: 2,
+                boxShadow: 'none',
+                color: '#667eea',
+                border: '2px solid #667eea',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  background: '#f7f7fa',
+                  color: '#5a6fd8',
+                  border: '2px solid #5a6fd8',
+                  transform: 'translateY(-1px)',
+                  boxShadow: '0 4px 15px rgba(102, 126, 234, 0.1)',
+                },
+              }}
+            >
+              My Profile
+            </Button>
+            <Button 
+              variant="outlined" 
+              onClick={handleLogout} 
+              sx={{ 
+                fontFamily: 'Nunito, sans-serif', 
+                fontWeight: 700, 
+                textTransform: 'none', 
+                px: 2.5,
+                borderWidth: 2,
+                borderRadius: 2,
+                boxShadow: 'none',
+                color: '#667eea',
+                border: '2px solid #667eea',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  background: '#f7f7fa',
+                  color: '#5a6fd8',
+                  border: '2px solid #5a6fd8',
+                  transform: 'translateY(-1px)',
+                  boxShadow: '0 4px 15px rgba(102, 126, 234, 0.1)',
+                },
+              }}
+            >
+              Log Out
+            </Button>
+          </Box>
+        </Box>
+
+        <Typography variant="h6" sx={{ fontWeight: 700, textAlign: 'center', mb: 1, fontFamily: 'Nunito, sans-serif', color: 'text.primary' }}>
+          Welcome, <span style={{ color: '#667eea' }}>{user?.displayName ? user.displayName.split(' ')[0] : user?.email}</span>!
+        </Typography>
+
+        <Typography variant="subtitle1" sx={{ textAlign: 'center', color: 'text.secondary', mb: 4, fontFamily: 'Nunito, sans-serif', opacity: 0.8 }}>
+          Enter your ingredients, and we'll create a recipe for you!
+        </Typography>
+
+        <TextField
+          fullWidth
+          multiline
+          rows={4}
+          label="Your Ingredients"
+          placeholder="e.g., chicken breast, rice, broccoli, soy sauce"
+          value={ingredients}
+          onChange={(e) => setIngredients(e.target.value)}
+          disabled={loading}
+          InputLabelProps={{ style: { fontFamily: 'Nunito, sans-serif' } }}
+          inputProps={{ style: { fontFamily: 'Nunito, sans-serif' } }}
+          sx={{ maxWidth: 500, mx: 'auto' }}
+        />
+        <Button
+          fullWidth
+          variant="contained"
+          size="large"
+          onClick={handleGenerateRecipe}
+          disabled={loading || !ingredients}
+          sx={{ 
+            mt: 2, 
+            py: 1.3, 
+            fontWeight: 600, 
+            fontFamily: 'Nunito, sans-serif', 
+            textTransform: 'none',
+            maxWidth: 500,
+            mx: 'auto',
+            borderRadius: 2,
+            background: '#667eea',
+            boxShadow: '0 4px 15px rgba(102, 126, 234, 0.15)',
+            '&:hover': {
+              background: '#5a6fd8',
+              transform: 'translateY(-1px)',
+              boxShadow: '0 6px 20px rgba(102, 126, 234, 0.18)',
+            },
+          }}
+        >
+          {loading ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+              <CircularProgress size={22} thickness={4} sx={{ color: '#fff' }} />
+            </Box>
+          ) : (
+            'Generate Recipe'
+          )}
+        </Button>
+        {error && <Alert severity="error" sx={{ mt: 2, textAlign: 'center', fontFamily: 'Nunito, sans-serif', maxWidth: 500, mx: 'auto' }}>{error}</Alert>}
+
+        {recipe && (
+          <Box sx={{ mt: 4, maxWidth: 800, mx: 'auto', width: '100%' }}>
+            <Divider sx={{ mb: 4, fontFamily: 'Nunito, sans-serif' }} />
+            <Typography variant="h4" component="h2" sx={{ fontWeight: 800, mb: 2, fontFamily: 'Nunito, sans-serif', textAlign: 'center', color: '#667eea' }}>{recipe.title}</Typography>
+            <Typography sx={{ my: 2, fontFamily: 'Nunito, sans-serif', color: 'text.secondary', opacity: 0.8 }}>{recipe.description}</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+              <Button
+                variant="outlined"
+                onClick={handleSaveRecipe}
+                disabled={isSaved}
+                sx={{ 
+                  fontWeight: 700, 
+                  fontFamily: 'Nunito, sans-serif', 
+                  textTransform: 'none', 
+                  borderWidth: 2, 
+                  borderRadius: 2, 
+                  px: 3, 
+                  boxShadow: 'none',
+                  color: '#667eea',
+                  border: '2px solid #667eea',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    background: '#f7f7fa',
+                    color: '#5a6fd8',
+                    border: '2px solid #5a6fd8',
+                    transform: 'translateY(-1px)',
+                    boxShadow: '0 4px 15px rgba(102, 126, 234, 0.1)',
+                  }
+                }}
+              >
+                {isSaved ? 'Recipe Saved!' : 'Save This Recipe'}
               </Button>
             </Box>
-          </Box>
-
-          <Divider sx={{ my: 1, fontFamily: 'Nunito, sans-serif' }} />
-
-          <Typography variant="h6" sx={{ fontWeight: 700, textAlign: 'center', mb: 1, fontFamily: 'Nunito, sans-serif' }}>
-            Welcome, <span style={{ color: '#1976d2' }}>{user?.displayName ? user.displayName.split(' ')[0] : user?.email}</span>!
-          </Typography>
-
-          <Typography variant="subtitle1" sx={{ textAlign: 'center', color: 'text.secondary', mb: 2, fontFamily: 'Nunito, sans-serif' }}>
-            Enter your ingredients, and we'll create a recipe for you!
-          </Typography>
-
-          <TextField
-            fullWidth
-            multiline
-            rows={4}
-            label="Your Ingredients"
-            placeholder="e.g., chicken breast, rice, broccoli, soy sauce"
-            value={ingredients}
-            onChange={(e) => setIngredients(e.target.value)}
-            disabled={loading}
-            InputLabelProps={{ style: { fontFamily: 'Nunito, sans-serif' } }}
-            inputProps={{ style: { fontFamily: 'Nunito, sans-serif' } }}
-          />
-          <Button
-            fullWidth
-            variant="contained"
-            size="large"
-            onClick={handleGenerateRecipe}
-            disabled={loading || !ingredients}
-            sx={{ mt: 2, py: 1.5, fontWeight: 600, fontFamily: 'Nunito, sans-serif', textTransform: 'none' }}
-          >
-            {loading ? <CircularProgress size={24} color="inherit" /> : 'Generate Recipe'}
-          </Button>
-          {error && <Alert severity="error" sx={{ mt: 2, textAlign: 'center', fontFamily: 'Nunito, sans-serif' }}>{error}</Alert>}
-
-          {recipe && (
-            <Box sx={{ mt: 4 }}>
-              <Divider sx={{ mb: 4, fontFamily: 'Nunito, sans-serif' }} />
-              <Typography variant="h4" component="h2" sx={{ fontWeight: 'bold', mb: 2, fontFamily: 'Nunito, sans-serif', textAlign: 'center' }}>{recipe.title}</Typography>
-              <Typography sx={{ my: 2, fontFamily: 'Nunito, sans-serif' }} color="text.secondary">{recipe.description}</Typography>
-              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  onClick={handleSaveRecipe}
-                  disabled={isSaved}
-                  sx={{ fontWeight: 700, fontFamily: 'Nunito, sans-serif', textTransform: 'none', borderWidth: 2, borderRadius: 2, px: 3, boxShadow: 'none', '&:hover': { backgroundColor: 'primary.main', color: 'white', borderColor: 'primary.main' } }}
-                >
-                  {isSaved ? 'Recipe Saved!' : 'Save This Recipe'}
-                </Button>
-              </Box>
-              {recipe.ingredients && recipe.instructions && (
-                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4, mt: 3 }}>
-                  <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                    <Typography variant="h6" gutterBottom sx={{ fontFamily: 'Nunito, sans-serif' }}>Ingredients</Typography>
-                    <List dense sx={{ width: '100%' }}>
-                      {recipe.ingredients.map((item, index) => (
-                        <ListItem key={index} sx={{ pl: 0 }}>
-                          <ListItemText
-                            primary={<span style={{ fontFamily: 'Nunito, sans-serif' }}>{`${index + 1}. ${item}`}</span>}
+            {recipe.ingredients && recipe.instructions && (
+              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4, mt: 3 }}>
+                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                  <Typography variant="h6" gutterBottom sx={{ fontFamily: 'Nunito, sans-serif', fontWeight: 700, color: '#667eea' }}>Ingredients</Typography>
+                  <List dense sx={{ width: '100%' }}>
+                    {recipe.ingredients.map((item, index) => (
+                      <ListItem key={index} sx={{ pl: 0 }}>
+                        <ListItemText
+                          primary={<span style={{ fontFamily: 'Nunito, sans-serif' }}>{`${index + 1}. ${item}`}</span>}
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+                <Box sx={{ flex: 2, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                  <Typography variant="h6" gutterBottom sx={{ fontFamily: 'Nunito, sans-serif', fontWeight: 700, color: '#667eea' }}>Instructions</Typography>
+                  <List sx={{ width: '100%' }}>
+                    {recipe.instructions.map((step, index) => {
+                      const cleanStep = step.replace(/^\s*\d+\.?\s*/, '');
+                      return (
+                        <ListItem key={index} alignItems="flex-start" sx={{ pl: 0 }}>
+                          <ListItemIcon sx={{ minWidth: '40px', mt: '4px' }}>
+                            <Typography sx={{ fontWeight: 'bold', fontFamily: 'Nunito, sans-serif', color: '#667eea' }}>{index + 1}.</Typography>
+                          </ListItemIcon>
+                          <ListItemText 
+                            primary={cleanStep} 
+                            sx={{ 
+                              fontFamily: 'Nunito, sans-serif',
+                              '& .MuiListItemText-primary': {
+                                fontFamily: 'Nunito, sans-serif',
+                                fontWeight: 400,
+                                lineHeight: 1.6,
+                              }
+                            }} 
                           />
                         </ListItem>
-                      ))}
-                    </List>
-                  </Box>
-                  <Box sx={{ flex: 2, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                    <Typography variant="h6" gutterBottom sx={{ fontFamily: 'Nunito, sans-serif' }}>Instructions</Typography>
-                    <List sx={{ width: '100%' }}>
-                      {recipe.instructions.map((step, index) => {
-                        const cleanStep = step.replace(/^\s*\d+\.?\s*/, '');
-                        return (
-                          <ListItem key={index} alignItems="flex-start" sx={{ pl: 0 }}>
-                            <ListItemIcon sx={{ minWidth: '40px', mt: '4px' }}>
-                              <Typography sx={{ fontWeight: 'bold', fontFamily: 'Nunito, sans-serif' }}>{index + 1}.</Typography>
-                            </ListItemIcon>
-                            <ListItemText primary={cleanStep} sx={{ fontFamily: 'Nunito, sans-serif' }} />
-                          </ListItem>
-                        );
-                      })}
-                    </List>
-                  </Box>
+                      );
+                    })}
+                  </List>
                 </Box>
-              )}
-            </Box>
-          )}
-        </Box>
-      </Paper>
+              </Box>
+            )}
+          </Box>
+        )}
+      </Box>
     </Container>
   );
 };

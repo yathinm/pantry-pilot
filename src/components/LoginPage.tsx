@@ -129,7 +129,16 @@ const LoginPage: React.FC<LoginPageProps> = ({ setPage }) => {
         >
           Log in with Google
         </Button>
-        <Divider sx={{ my: 2, fontFamily: 'Nunito, sans-serif' }}>or</Divider>
+        <Divider sx={{ 
+          my: 2, 
+          fontFamily: 'Nunito, sans-serif',
+          '& .MuiDivider-wrapper': {
+            fontFamily: 'Nunito, sans-serif',
+            fontWeight: 600,
+            color: 'text.secondary',
+            fontSize: '1.1rem',
+          }
+        }}>or</Divider>
         <Stack spacing={2} sx={{ fontFamily: 'Nunito, sans-serif', width: '100%', maxWidth: 350, mx: 'auto' }}>
           <TextField
             label="Email"
