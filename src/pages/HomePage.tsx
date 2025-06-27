@@ -248,34 +248,36 @@ const HomePage: React.FC<HomePageProps> = ({ setPage }) => {
             <Divider sx={{ mb: 4, fontFamily: 'Nunito, sans-serif' }} />
             <Typography variant="h4" component="h2" sx={{ fontWeight: 800, mb: 2, fontFamily: 'Nunito, sans-serif', textAlign: 'center', color: '#667eea' }}>{recipe.title}</Typography>
             <Typography sx={{ my: 2, fontFamily: 'Nunito, sans-serif', color: 'text.secondary', opacity: 0.8 }}>{recipe.description}</Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-              <Button
-                variant="outlined"
-                onClick={handleSaveRecipe}
-                disabled={isSaved}
-                sx={{ 
-                  fontWeight: 700, 
-                  fontFamily: 'Nunito, sans-serif', 
-                  textTransform: 'none', 
-                  borderWidth: 2, 
-                  borderRadius: 2, 
-                  px: 3, 
-                  boxShadow: 'none',
-                  color: '#667eea',
-                  border: '2px solid #667eea',
-                  transition: 'all 0.2s ease',
-                  '&:hover': {
-                    background: '#f7f7fa',
-                    color: '#5a6fd8',
-                    border: '2px solid #5a6fd8',
-                    transform: 'translateY(-1px)',
-                    boxShadow: '0 4px 15px rgba(102, 126, 234, 0.1)',
-                  }
-                }}
-              >
-                {isSaved ? 'Recipe Saved!' : 'Save This Recipe'}
-              </Button>
-            </Box>
+            {recipe.title !== 'Inedible Ingredients' && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                <Button
+                  variant="outlined"
+                  onClick={handleSaveRecipe}
+                  disabled={isSaved}
+                  sx={{ 
+                    fontWeight: 700, 
+                    fontFamily: 'Nunito, sans-serif', 
+                    textTransform: 'none', 
+                    borderWidth: 2, 
+                    borderRadius: 2, 
+                    px: 3, 
+                    boxShadow: 'none',
+                    color: '#667eea',
+                    border: '2px solid #667eea',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      background: '#f7f7fa',
+                      color: '#5a6fd8',
+                      border: '2px solid #5a6fd8',
+                      transform: 'translateY(-1px)',
+                      boxShadow: '0 4px 15px rgba(102, 126, 234, 0.1)',
+                    }
+                  }}
+                >
+                  {isSaved ? 'Recipe Saved!' : 'Save This Recipe'}
+                </Button>
+              </Box>
+            )}
             {recipe.ingredients && recipe.instructions && (
               <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4, mt: 3 }}>
                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
