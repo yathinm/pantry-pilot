@@ -35,9 +35,10 @@ You must have Node.js and the Firebase CLI installed on your machine.
 ### Setup and Installation
 
 1. **Clone the Repository**
+```
 git clone https://github.com/your-username/pantry-pilot.git
 cd pantry-pilot
-
+```
 
 2. **Install Frontend Dependencies**
 npm install
@@ -54,7 +55,7 @@ cd ..
 * **Note:** Every Firebase project is also a full Google Cloud (GCP) project. You may need to access the [Google Cloud Console](https://console.cloud.google.com/) for advanced settings.
 * In Firebase, enable **Authentication** (with Email/Password and Google providers).
 * In Firebase, enable **Firestore Database**.
-* Upgrade your project to the **Blaze (Pay-as-you-go) plan**. This is required for v2 Cloud Functions, but the free tier is very generous.
+* Upgrade your project to the **Blaze (Pay-as-you-go) plan**. This is required for v2 Cloud Functions.
 
 5. **Configure Frontend Environment Variables**
 * In the Firebase Console, go to your Project Settings and add a new **Web App**.
