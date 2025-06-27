@@ -6,7 +6,6 @@ import {
   Button,
   Container,
   Divider,
-  Paper,
   Stack,
   TextField,
   Typography,
@@ -35,7 +34,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setPage }) => {
   const handleGoogleSignIn = async () => {
     try {
       await signInWithPopup(auth, provider);
-    } catch (err) {
+    } catch {
       setErrorMsg('Could not sign in with Google. Please try again.');
     }
   };
@@ -45,7 +44,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setPage }) => {
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email.trim(), password);
-    } catch (err) {
+    } catch {
       setErrorMsg('Invalid email or password. Please try again.');
     } finally {
       setLoading(false);
@@ -54,129 +53,165 @@ const LoginPage: React.FC<LoginPageProps> = ({ setPage }) => {
 
   return (
     <Container maxWidth="sm" sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f7f7fa' }}>
-      <Paper elevation={4} sx={{ p: { xs: 2, sm: 4 }, width: '100%', borderRadius: 3 }}>
-        <Box
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 4,
+          fontFamily: 'Nunito, sans-serif',
+          textAlign: 'center',
+          width: '100%',
+        }}
+      >
+        <Typography
+          variant="h2"
           sx={{
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 2,
+            fontWeight: 800,
+            letterSpacing: 2,
             fontFamily: 'Nunito, sans-serif',
+            color: '#667eea',
+            mb: 1,
+            animation: 'float 3s ease-in-out infinite',
+            '@keyframes float': {
+              '0%, 100%': {
+                transform: 'translateY(0px)',
+              },
+              '50%': {
+                transform: 'translateY(-10px)',
+              },
+            },
           }}
         >
-          <Typography variant="h4" sx={{ fontWeight: 'bold', textAlign: 'center', mb: 1, letterSpacing: 1, fontFamily: 'Nunito, sans-serif' }}>
-            Pantry Pilot
-          </Typography>
-          <Typography variant="subtitle1" sx={{ textAlign: 'center', color: 'text.secondary', mb: 2, fontFamily: 'Nunito, sans-serif' }}>
-            Log in to your account
-          </Typography>
-
-          <Button
+          Pantry Pilot
+        </Typography>
+        <Typography
+          variant="h6"
+          sx={{
+            color: 'text.secondary',
+            fontFamily: 'Nunito, sans-serif',
+            fontWeight: 400,
+            mb: 4,
+            opacity: 0.8,
+          }}
+        >
+          Log in to your account
+        </Typography>
+        <Button
+          fullWidth
+          variant="outlined"
+          startIcon={<GoogleIcon sx={{ color: '#667eea' }} />}
+          onClick={handleGoogleSignIn}
+          sx={{
+            py: 1.6,
+            fontWeight: 700,
+            textTransform: 'none',
+            fontFamily: 'Nunito, sans-serif',
+            mb: 1,
+            borderWidth: 2,
+            borderRadius: 2,
+            boxShadow: 'none',
+            color: '#667eea',
+            border: '2px solid #667eea',
+            background: '#f7f7fa',
+            transition: 'all 0.2s ease',
+            '& .MuiButton-label': {
+              marginTop: '60px',
+            },
+            '&:hover': {
+              background: '#f7f7fa',
+              color: '#5a6fd8',
+              border: '2px solid #5a6fd8',
+              transform: 'translateY(-1px)',
+              boxShadow: '0 4px 15px rgba(102, 126, 234, 0.1)',
+            },
+          }}
+        >
+          Log in with Google
+        </Button>
+        <Divider sx={{ my: 2, fontFamily: 'Nunito, sans-serif' }}>or</Divider>
+        <Stack spacing={2} sx={{ fontFamily: 'Nunito, sans-serif', width: '100%', maxWidth: 350, mx: 'auto' }}>
+          <TextField
+            label="Email"
+            type="email"
             fullWidth
-            variant="contained"
-            startIcon={<GoogleIcon />}
-            onClick={handleGoogleSignIn}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            InputLabelProps={{ style: { fontFamily: 'Nunito, sans-serif' } }}
+            inputProps={{ style: { fontFamily: 'Nunito, sans-serif' } }}
+          />
+          <TextField
+            label="Password"
+            type={showPassword ? 'text' : 'password'}
+            fullWidth
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+            InputLabelProps={{ style: { fontFamily: 'Nunito, sans-serif' } }}
+            inputProps={{ style: { fontFamily: 'Nunito, sans-serif' } }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    onClick={() => setShowPassword((show) => !show)}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Stack>
+        <Button
+          fullWidth
+          variant="contained"
+          color="primary"
+          disabled={loading || !email || !password}
+          onClick={handleEmailSignIn}
+          sx={{ py: 1.3, textTransform: 'none', mt: 2, fontWeight: 600, fontFamily: 'Nunito, sans-serif', borderRadius: 2, background: '#667eea', boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)', '&:hover': { background: '#5a6fd8', transform: 'translateY(-1px)', boxShadow: '0 6px 20px rgba(102, 126, 234, 0.4)' } }}
+        >
+          {loading ? <CircularProgress size={24} color="inherit" /> : 'Log In'}
+        </Button>
+        {errorMsg && (
+          <Alert severity="error" sx={{ mt: 2, textAlign: 'center', fontFamily: 'Nunito, sans-serif' }}>
+            {errorMsg}
+          </Alert>
+        )}
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 4, gap: 1 }}>
+          <Typography variant="body1" sx={{ fontWeight: 700, fontSize: '1.08rem', fontFamily: 'Nunito, sans-serif', color: 'text.primary' }}>
+            Don't have an account?
+          </Typography>
+          <Button
+            size="medium"
+            variant="outlined"
+            onClick={() => setPage('SignupPage')}
             sx={{
-              py: 1.6,
-              fontWeight: 600,
               textTransform: 'none',
-              transition: 'transform 0.15s',
-              background: '#fff',
-              color: '#222',
-              border: '1px solid #e0e0e0',
-              boxShadow: 'none',
+              fontWeight: 700,
               fontFamily: 'Nunito, sans-serif',
-              '&:hover': { transform: 'translateY(-2px)', background: '#f5f5f5' },
+              borderWidth: 2,
+              borderRadius: 2,
+              ml: 1,
+              px: 2.5,
+              boxShadow: 'none',
+              color: '#667eea',
+              border: '2px solid #667eea',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                background: 'white',
+                color: '#5a6fd8',
+                transform: 'translateY(-1px)',
+                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.1)',
+              },
             }}
           >
-            Log in with Google
+            Sign Up
           </Button>
-
-          <Divider sx={{ my: 2, fontFamily: 'Nunito, sans-serif' }}>or</Divider>
-
-          <Stack spacing={2} sx={{ fontFamily: 'Nunito, sans-serif' }}>
-            <TextField
-              label="Email"
-              type="email"
-              fullWidth
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
-              InputLabelProps={{ style: { fontFamily: 'Nunito, sans-serif' } }}
-              inputProps={{ style: { fontFamily: 'Nunito, sans-serif' } }}
-            />
-            <TextField
-              label="Password"
-              type={showPassword ? 'text' : 'password'}
-              fullWidth
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-              InputLabelProps={{ style: { fontFamily: 'Nunito, sans-serif' } }}
-              inputProps={{ style: { fontFamily: 'Nunito, sans-serif' } }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label={showPassword ? 'Hide password' : 'Show password'}
-                      onClick={() => setShowPassword((show) => !show)}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Stack>
-
-          <Button
-            fullWidth
-            variant="contained"
-            color="primary"
-            disabled={loading || !email || !password}
-            onClick={handleEmailSignIn}
-            sx={{ py: 1.3, textTransform: 'none', mt: 1, fontWeight: 600, fontFamily: 'Nunito, sans-serif' }}
-          >
-            {loading ? <CircularProgress size={24} color="inherit" /> : 'Log In'}
-          </Button>
-
-          {errorMsg && (
-            <Alert severity="error" sx={{ mt: 2, textAlign: 'center', fontFamily: 'Nunito, sans-serif' }}>
-              {errorMsg}
-            </Alert>
-          )}
-
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 4, gap: 1 }}>
-            <Typography variant="body1" sx={{ fontWeight: 700, fontSize: '1.08rem', fontFamily: 'Nunito, sans-serif', color: 'text.primary' }}>
-              Don't have an account?
-            </Typography>
-            <Button
-              size="medium"
-              variant="outlined"
-              color="primary"
-              onClick={() => setPage('SignupPage')}
-              sx={{
-                textTransform: 'none',
-                fontWeight: 700,
-                fontFamily: 'Nunito, sans-serif',
-                borderWidth: 2,
-                borderRadius: 2,
-                ml: 1,
-                px: 2.5,
-                boxShadow: 'none',
-                '&:hover': {
-                  backgroundColor: 'primary.main',
-                  color: 'white',
-                  borderColor: 'primary.main',
-                },
-              }}
-            >
-              Sign Up
-            </Button>
-          </Box>
         </Box>
-      </Paper>
+      </Box>
     </Container>
   );
 };
