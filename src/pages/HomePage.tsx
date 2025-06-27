@@ -270,9 +270,20 @@ const HomePage: React.FC<HomePageProps> = ({ setPage }) => {
                   <Typography variant="h6" gutterBottom sx={{ fontFamily: 'Nunito, sans-serif', fontWeight: 700, color: '#667eea' }}>Ingredients</Typography>
                   <List dense sx={{ width: '100%' }}>
                     {recipe.ingredients.map((item, index) => (
-                      <ListItem key={index} sx={{ pl: 0 }}>
+                      <ListItem key={index} alignItems="flex-start" sx={{ pl: 0 }}>
+                        <ListItemIcon sx={{ minWidth: '40px', mt: '4px' }}>
+                          <Typography sx={{ fontWeight: 'bold', fontFamily: 'Nunito, sans-serif', color: '#667eea' }}>{index + 1}.</Typography>
+                        </ListItemIcon>
                         <ListItemText
-                          primary={<span style={{ fontFamily: 'Nunito, sans-serif' }}>{`${index + 1}. ${item}`}</span>}
+                          primary={item}
+                          sx={{
+                            fontFamily: 'Nunito, sans-serif',
+                            '& .MuiListItemText-primary': {
+                              fontFamily: 'Nunito, sans-serif',
+                              fontWeight: 400,
+                              lineHeight: 1.6,
+                            }
+                          }}
                         />
                       </ListItem>
                     ))}
