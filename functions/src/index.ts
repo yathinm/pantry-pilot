@@ -5,7 +5,53 @@ import OpenAI from "openai";
 import * as admin from "firebase-admin";
 
 admin.initializeApp();
-const db = admin.firestore()
+const db = admin.firestore();
+
+// Rate limit: max API calls per user per window (applies to both recipe endpoints)
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const RATE_LIMIT_MAX_REQUESTS = 20;
+
+interface RateLimitState {
+  count: number;
+  windowStart: admin.firestore.Timestamp;
+}
+
+/**
+ * Checks rate limit for the user and increments count in a transaction.
+ * Throws HttpsError "resource-exhausted" if over limit.
+ */
+async function checkAndIncrementRateLimit(uid: string): Promise<void> {
+  const ref = db.collection("rateLimits").doc(uid);
+  await db.runTransaction(async (tx) => {
+    const now = admin.firestore.Timestamp.now();
+    const doc = await tx.get(ref);
+    let state: RateLimitState;
+
+    if (!doc.exists) {
+      state = { count: 0, windowStart: now };
+    } else {
+      const data = doc.data() as RateLimitState;
+      const elapsed = now.toMillis() - data.windowStart.toMillis();
+      if (elapsed >= RATE_LIMIT_WINDOW_MS) {
+        state = { count: 0, windowStart: now };
+      } else {
+        state = { count: data.count, windowStart: data.windowStart };
+      }
+    }
+
+    if (state.count >= RATE_LIMIT_MAX_REQUESTS) {
+      throw new HttpsError(
+        "resource-exhausted",
+        `Rate limit exceeded. You can make up to ${RATE_LIMIT_MAX_REQUESTS} recipe requests per hour. Try again later.`
+      );
+    }
+
+    tx.set(ref, {
+      count: state.count + 1,
+      windowStart: state.windowStart,
+    });
+  });
+}
 
 interface RequestData {
   ingredients: string;
@@ -43,6 +89,8 @@ export const generateRecipe = onCall({ secrets: [OPENAI_API_KEY_SECRET] }, async
       );
     }
 
+    await checkAndIncrementRateLimit(uid);
+
     try {
       const ingredientArray = ingredients.toLowerCase().split(/[\s,]+/).filter(Boolean);
 
@@ -63,7 +111,19 @@ export const generateRecipe = onCall({ secrets: [OPENAI_API_KEY_SECRET] }, async
 
     logger.info("v2 Function called with ingredients:", ingredients);
 
-    const prompt = `You are an expert chef. A user has the following ingredients: ${ingredients}. Your first task is to determine if the provided items are edible food ingredients. If the ingredients are clearly not edible (e.g., 'rocks, dirt, plastic'), you MUST respond with the following JSON object: { "title": "Inedible Ingredients", "description": "These ingredients are not edible and cannot be made into a recipe." }. If the ingredients ARE edible, your primary goal is to identify a well-known, classic recipe that can be made using these ingredients. Do not invent a new recipe if a classic one fits. If no classic recipe is a direct match, your secondary goal is to create a new recipe that is closely inspired by a classic dish, using ONLY the ingredients provided. In your response, only list the ingredients from the user's list that are actually used in the recipe. Respond ONLY with a valid JSON object with the following strict structure: { "title": "Recipe Title", "description": "A short, enticing description of the dish. If it's not a classic recipe, mention which classic dish it is similar to.", "ingredients": ["ingredient 1 from user's list", "ingredient 2 from user's list"], "instructions": ["Step 1 of the recipe", "Step 2", "etc."] }`;
+    const prompt = `You are an expert chef. A user has the following ingredients: ${ingredients}.
+
+Your first task is to determine if the provided items are edible food ingredients. If they are clearly not edible (e.g., rocks, dirt, plastic), respond ONLY with this JSON object: { "title": "Inedible Ingredients", "description": "These ingredients are not edible and cannot be made into a recipe." }.
+
+If the ingredients ARE edible:
+- Prefer a well-known classic recipe that fits; otherwise create one clearly inspired by a classic dish.
+- Base the dish primarily on the user's list. You MAY add minimal pantry staples only when necessary for a coherent recipe: salt, black pepper, neutral cooking oil OR butter, water, and alliums/herbs/spices only if the user already listed something in that family (e.g. garlic, onion). Every staple you use must appear in "ingredients" with a quantity—never mention something in instructions that is not listed there.
+- Ingredients array: each entry must be specific and actionable—approximate quantity + unit (imperial or metric, pick one system and stay consistent), the food name, and preparation when it matters (e.g. "1 lb boneless chicken thighs, cut into 1-inch pieces", "1 medium lemon, zest and 3 tbsp juice"). Include ingredient types/cuts when relevant (breast vs thigh, rice variety if inferable).
+- If the recipe includes raw meat, poultry, or fish: instructions MUST explain how to prepare and season it before or during cooking (dry/pat dry if applicable, salt and pepper amounts or "to taste", any rub or marinade timing using only listed ingredients, browning/simmering cues). Do not assume protein is already cooked unless the user's ingredients imply it (e.g. "rotisserie chicken", "cooked rice").
+- Instructions: numbered logical steps; include heat levels and rough times where helpful; season/taste adjustments at the end when appropriate.
+- Do not leave gaps (e.g. "add broth" without broth or water + bouillon in ingredients).
+
+Respond ONLY with valid JSON in this exact shape: { "title": "Recipe Title", "description": "A short, enticing description; if not a classic recipe, say which classic it resembles.", "ingredients": ["quantity + detail ..."], "instructions": ["Step 1 ...", "Step 2 ..."] }`;
 
 
     const completion = await openai.chat.completions.create({
@@ -110,6 +170,8 @@ export const getRecommendedRecipes = onCall({ secrets: [OPENAI_API_KEY_SECRET_RE
     }
     const uid = request.auth.uid;
 
+    await checkAndIncrementRateLimit(uid);
+
     const userDocRef = admin.firestore().collection('users').doc(uid);
     const userDoc = await userDocRef.get();
 
@@ -131,7 +193,13 @@ export const getRecommendedRecipes = onCall({ secrets: [OPENAI_API_KEY_SECRET_RE
 
     logger.info(`Generating recommendations for user ${uid} based on top ingredients:`, topIngredients);
 
-    const prompt = `You are a recipe recommender. A user frequently cooks with the following ingredients: ${topIngredients.join(', ')}. Your task is to suggest 3 new and interesting, but not overly complex, recipes they might enjoy. For each recipe, provide a title, a short description, a list of ingredients, and step-by-step instructions. Respond ONLY with a valid JSON object with the following strict structure: { "recommendations": [{ "title": "Recipe Title 1", "description": "A short description.", "ingredients": ["Ingredient 1", "Ingredient 2"], "instructions": ["Step 1", "Step 2"] }] }`;
+    const prompt = `You are a recipe recommender. A user frequently cooks with: ${topIngredients.join(', ')}. Suggest 3 new, interesting, moderately simple recipes that fit those flavors.
+
+For EACH recommendation:
+- Ingredients: every item needs approximate quantity + unit (consistent imperial OR metric), specific names/cuts where useful, and prep notes when needed (e.g. diced, minced). Include minimal pantry staples only if required (salt, pepper, oil/butter, water); list every one with quantities. Nothing may appear only in instructions—it must be in the ingredients list too.
+- Instructions: clear steps with heat and rough times when helpful. If a recipe uses meat, poultry, or fish, include explicit seasoning and protein-cooking steps (not "use cooked chicken" unless the dish truly requires pre-cooked protein—prefer teaching seasoning and cooking from raw when sensible).
+
+Respond ONLY with valid JSON: { "recommendations": [{ "title": "...", "description": "...", "ingredients": ["quantity ..."], "instructions": ["Step 1 ..."] }] }`;
     
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
